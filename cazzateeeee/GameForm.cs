@@ -1,16 +1,34 @@
 using cazzateeeee.Classes;
+using cazzateeeee.Helpers;
 
 namespace cazzateeeee
 {
-    public partial class Form1 : Form
+    public partial class GameForm : Form
     {
-        public Form1()
+        private GameManager gm;
+
+        public GameForm(int mod)
         {
+            // cose da designer 
             InitializeComponent();
+            // inizialize la UI, quindi bottoni label e altre cose
             InitializeUI();
-            InitilizeGame();
+            // "Creo il gioco"
+            gm = new GameManager();
+            // in base alla modalitá sceltá dal giocatore avvio il gioco senza bot (0) con 1 bot (1) con 2 bot (2)
+            switch (mod) 
+            {
+                case 0:
+                    gm.StartGamePVP();  
+                    break;
+                case 1:
+                    gm.StartGamePVE();
+                    break;
+                case 2:
+                    gm.StartGameEVE();
+                    break;
+            }
         }
-        private static readonly char[] trimChars = new char[] { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
         internal void InitializeUI()
         {
@@ -32,30 +50,33 @@ namespace cazzateeeee
                             Tag = $"Tris{num_tris}Row{num_row}Col{num_col}"
                         };
 
-                        // aggiungi ai sender
+                        // aggiungi ai sender e dai il metodo mossa
                         btn.Click += Mossa; 
                         Controls.Add(btn);
                     }
                 }   
             }
         }
-
+        
         private void Mossa(object? sender, EventArgs e)
         {
-            // in questa funzione devo prendere il tag che ha questa forma {Tris0Raw1Col2} e devo spezzarlo in 3 string 
-            // cosí {Tris0} {Raw1} {Col2}
-            string StringaTag = (sender as Button).Tag.ToString();
-            string[] StringeTag = StringaTag.Split('0', '1', '2');
-
-            foreach (string str in StringeTag)
+            if (sender is Button btn)
             {
-                MessageBox.Show(str);
+                btn.Text = $"{gm.GetTurno()}";
+
+                string Tag = btn.Tag.ToString();
+                string NumeriTag = "";
+
+                foreach (char c in Tag)
+                {
+                    if (char.IsDigit(c))
+                        NumeriTag += c;
+                }
+
+                gm.MakeMove(NumeriTag[0], NumeriTag[1], NumeriTag[2]);
             }
         }
 
-        internal void InitilizeGame()
-        {
-            Supertris st = new Supertris();
-        }
+        
     }
 }

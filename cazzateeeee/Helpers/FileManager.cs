@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace cazzateeeee
 {
-    public static class SalvaFile
+    public static class FileManager
     {
         private static string percorso = "mosse.txt";
 
         // Scrive una riga nel file, aggiungendola in coda
-        public static void Scrivi(string testo)
+        public static void Write(string testo)
         {
             using (StreamWriter sw = new StreamWriter(percorso, true))
             {
@@ -19,6 +19,6 @@ namespace cazzateeeee
             }
         }
 
-        // SalvaFile.Scrivi($"{giocatoreCorrente} ({rigaGlobale},{colGlobale})");
+        // SalvaFile.Scrivi($"{giocatoreCorrente} ({NumTris}{NumRiga},{NumColonna})");
     }
 }

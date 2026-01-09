@@ -22,5 +22,20 @@ namespace cazzateeeee.Classes
                 }
             }
         }
+
+        public char MakeMove(char player, char tris, char row, char col)
+        {
+            int COSODELLEOPERAZIONI = Convert.ToInt32(tris) - 48; // trasformo da char a int, c'é un modo migliore, si, lo conosco, probabilemente
+            int colCount = COSODELLEOPERAZIONI % 3;
+            int rawCount = 0;
+
+            while (COSODELLEOPERAZIONI > 0)
+            {
+                COSODELLEOPERAZIONI -= 3;
+                rawCount++;
+            }
+
+            return board[rawCount, colCount].MakeMove(player, row, col);
+        }
     }
 }
