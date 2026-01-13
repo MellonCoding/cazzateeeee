@@ -10,6 +10,7 @@ namespace cazzateeeee.Classes
     {
         private Tris[,] board;
 
+
         public Supertris() 
         {
             board = new Tris[3, 3];
@@ -37,5 +38,29 @@ namespace cazzateeeee.Classes
 
             return board[rawCount, colCount].MakeMove(player, row, col);
         }
+
+        //public char CheckWin()
+        //{
+        //    char won;
+        //    for (int row = 0; row < 3; row++)
+        //    {
+        //        won = miniBoard[row, 0] == miniBoard[row, 1] && miniBoard[row, 1] == miniBoard[row, 2] ? miniBoard[row, 0] : '-';
+        //    }
+
+        //    for (int col = 0; col < 3; col++)
+        //    {
+        //        won = miniBoard[0, col] == miniBoard[1, col] && miniBoard[1, col] == miniBoard[2, col] ? miniBoard[0, col] : '-';
+        //    }
+
+        //    int x = 0, y = 0;
+        //    a
+        //    won = miniBoard[x, y] == miniBoard[x + 1, y + 1] && miniBoard[x + 1, y + 1] == miniBoard[x, y] ? miniBoard[x, y] : '-';
+
+        //    y += 2;
+
+        //    won = miniBoard[x, y] == miniBoard[x + 1, y - 1] && miniBoard[x + 1, y - 1] == miniBoard[x + 2, y - 2] ? miniBoard[x, y] : '-';
+
+        //    return '-';
+        //}
     }
 }
