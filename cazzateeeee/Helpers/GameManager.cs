@@ -25,6 +25,7 @@ namespace cazzateeeee.Helpers
 
         // ---------------- HELPERS --------------------------- vediamo se sta sintassi funziona, se non funzia leviamo
         public char GetTurno() { return turno; }
+        public void CambiaTurno() { if (turno == 'X') turno = 'O'; else turno = 'X'; }
 
         // ---------------- END HELPERS ---------------------------
 
@@ -62,15 +63,17 @@ namespace cazzateeeee.Helpers
 
         }
 
-        public void MakeMove(char tris, char row, char col) 
+        public bool MakeMove(char tris, char row, char col) 
         {
-            board.MakeMove(turno, tris, row, col);
-
-            FileManager.Write($"{turno} {tris}{row}{col}"); // DA DELEGARE
+            // DA DELEGARE FileManager.Write($"{turno} {tris}{row}{col}");
+            return board.MakeMove(turno, tris, row, col);
         }
 
-        
+        public char CheckWin()
+        {
 
-        public void WaitMove() { }
+
+            return '-';
+        }
     }
 }

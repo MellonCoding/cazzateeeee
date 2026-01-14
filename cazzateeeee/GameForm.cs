@@ -11,10 +11,13 @@ namespace cazzateeeee
         {
             // cose da designer 
             InitializeComponent();
+
             // inizialize la UI, quindi bottoni label e altre cose
             InitializeUI();
+            
             // "Creo il gioco"
             gm = new GameManager();
+            
             // in base alla modalitá sceltá dal giocatore avvio il gioco senza bot (0) con 1 bot (1) con 2 bot (2)
             switch (mod) 
             {
@@ -41,6 +44,7 @@ namespace cazzateeeee
                     for (int num_col = 0; num_col < 3; num_col++)
                     {
                         if (num_tris > 5) y_tris = 2; else if (num_tris > 2) y_tris = 1; else y_tris = 0;
+            
                         // crea bottone
                         Button btn = new Button
                         {
@@ -62,8 +66,6 @@ namespace cazzateeeee
         {
             if (sender is Button btn)
             {
-                btn.Text = $"{gm.GetTurno()}";
-
                 string Tag = btn.Tag.ToString();
                 string NumeriTag = "";
 
@@ -73,10 +75,24 @@ namespace cazzateeeee
                         NumeriTag += c;
                 }
 
-                gm.MakeMove(NumeriTag[0], NumeriTag[1], NumeriTag[2]);
+                if (gm.MakeMove(NumeriTag[0], NumeriTag[1], NumeriTag[2]))
+                {
+                    // mostro all' utente la mossa
+                    btn.Text = $"{gm.GetTurno()}";
+
+                    using (var won = gm.CheckWin())
+                    {
+                        MessageBox.Show($"{won} ha vinto! ");
+                    }
+
+                    // cambio il turno per il programma 
+                    gm.CambiaTurno();
+                }
+            }
+            else
+            {
+                MessageBox.Show("Ci e' stato un problema socio, riavvia, se persiste flamma mellon");
             }
         }
-
-        
     }
 }

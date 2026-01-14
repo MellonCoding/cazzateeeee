@@ -10,7 +10,6 @@ namespace cazzateeeee.Classes
     {
         private Tris[,] board;
 
-
         public Supertris() 
         {
             board = new Tris[3, 3];
@@ -24,7 +23,7 @@ namespace cazzateeeee.Classes
             }
         }
 
-        public char MakeMove(char player, char tris, char row, char col)
+        public bool MakeMove(char player, char tris, char row, char col)
         {
             int COSODELLEOPERAZIONI = Convert.ToInt32(tris) - 48; // trasformo da char a int, c'é un modo migliore, si, lo conosco, probabilemente
             int colCount = COSODELLEOPERAZIONI % 3;
