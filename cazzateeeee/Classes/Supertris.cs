@@ -29,37 +29,41 @@ namespace cazzateeeee.Classes
             int colCount = COSODELLEOPERAZIONI % 3;
             int rawCount = 0;
 
-            while (COSODELLEOPERAZIONI > 0)
+            while (COSODELLEOPERAZIONI > 2)
             {
                 COSODELLEOPERAZIONI -= 3;
                 rawCount++;
             }
 
+            char won = board[rawCount, colCount].CheckWin();
+            if (won != '-') MessageBox.Show($"{won}");
+
             return board[rawCount, colCount].MakeMove(player, row, col);
         }
 
-        //public char CheckWin()
-        //{
-        //    char won;
-        //    for (int row = 0; row < 3; row++)
-        //    {
-        //        won = miniBoard[row, 0] == miniBoard[row, 1] && miniBoard[row, 1] == miniBoard[row, 2] ? miniBoard[row, 0] : '-';
-        //    }
+        public char CheckWin()
+        {
+            char won = '-';
 
-        //    for (int col = 0; col < 3; col++)
-        //    {
-        //        won = miniBoard[0, col] == miniBoard[1, col] && miniBoard[1, col] == miniBoard[2, col] ? miniBoard[0, col] : '-';
-        //    }
+            for (int row = 0; row < 3; row++)
+            {
+                won = board[row, 0].wonBy() == board[row, 1].wonBy() && board[row, 1].wonBy() == board[row, 2].wonBy() ? board[row, 0].wonBy() : won;
+            }
 
-        //    int x = 0, y = 0;
-        //    a
-        //    won = miniBoard[x, y] == miniBoard[x + 1, y + 1] && miniBoard[x + 1, y + 1] == miniBoard[x, y] ? miniBoard[x, y] : '-';
+            for (int col = 0; col < 3; col++)
+            {
+                won = board[0, col].wonBy() == board[1, col].wonBy() && board[1, col].wonBy() == board[2, col].wonBy() ? board[0, col].wonBy() : won;
+            }
 
-        //    y += 2;
+            int x = 0, y = 0;
 
-        //    won = miniBoard[x, y] == miniBoard[x + 1, y - 1] && miniBoard[x + 1, y - 1] == miniBoard[x + 2, y - 2] ? miniBoard[x, y] : '-';
+            won = board[x, y].wonBy() == board[x + 1, y + 1].wonBy() && board[x + 1, y + 1].wonBy() == board[x, y].wonBy() ? board[x, y].wonBy() : '-';
 
-        //    return '-';
-        //}
+            y += 2;
+
+            won = board[x, y].wonBy() == board[x + 1, y - 1].wonBy() && board[x + 1, y - 1].wonBy() == board[x + 2, y - 2].wonBy() ? board[x, y].wonBy() : '-';
+
+            return won;
+        }
     }
 }

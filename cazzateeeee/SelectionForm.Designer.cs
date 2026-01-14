@@ -87,6 +87,7 @@
             Controls.Add(label1);
             Controls.Add(btnPlayerPlayer);
             Name = "SelectionForm";
+            StartPosition = FormStartPosition.CenterParent;
             Text = "SelectionForm";
             ResumeLayout(false);
             PerformLayout();

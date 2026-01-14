@@ -9,7 +9,7 @@ namespace cazzateeeee.Classes
     internal class Tris
     {
         private char[,] miniBoard;
-        private char wonBy;
+        private char winner;
 
         public Tris()
         {
@@ -24,8 +24,12 @@ namespace cazzateeeee.Classes
             }
         }
 
+        public char wonBy() { return winner; }
+
         public bool MakeMove(char player, char row, char col)
         {
+            if (winner != '-') return false;
+
             row -= (char)48; col -= (char)48; 
             // CHECK QUI; qui CheckWin fa i conrolli e ritorna il char del vincente, ti va bene? becuse possimao anche fare che se la mossa e' valida
             // la fa e se vede che qualcuno ha vinto allora ritrono player, vedi se ti torna utile per qualcosa
@@ -44,27 +48,24 @@ namespace cazzateeeee.Classes
             for (int row = 0; row < 3; row++)
             {
                 if (won != '-') continue;
-                won = miniBoard[row, 0] == miniBoard[row, 1] && miniBoard[row, 1] == miniBoard[row, 2] ? miniBoard[row, 0] : '-';
+                won = miniBoard[row, 0] == miniBoard[row, 1] && miniBoard[row, 1] == miniBoard[row, 2] ? miniBoard[row, 0] : won;
             }
 
             for (int col = 0; col < 3; col++)
             {
                 if (won != '-') continue;
-                won = miniBoard[0, col] == miniBoard[1, col] && miniBoard[1, col] == miniBoard[2, col] ? miniBoard[0, col] : '-';
+                won = miniBoard[0, col] == miniBoard[1, col] && miniBoard[1, col] == miniBoard[2, col] ? miniBoard[0, col] : won;
             }
-
-            if (won != '-') return won;
 
             int x = 0, y = 0;
 
-            won = miniBoard[x, y] == miniBoard[x+1, y+1] && miniBoard[x+1, y+1] == miniBoard[x, y] ? miniBoard[x, y] : '-';
-
-            if (won != '-') return won;
+            won = miniBoard[x, y] == miniBoard[x+1, y+1] && miniBoard[x+1, y+1] == miniBoard[x, y] ? miniBoard[x, y] : won;
 
             y += 2;
 
-            won = miniBoard[x, y] == miniBoard[x + 1, y - 1] && miniBoard[x + 1, y - 1] == miniBoard[x + 2, y - 2] ? miniBoard[x, y] : '-';
+            won = miniBoard[x, y] == miniBoard[x + 1, y - 1] && miniBoard[x + 1, y - 1] == miniBoard[x + 2, y - 2] ? miniBoard[x, y] : won;
 
+            winner = won;
 
             return won;
         }

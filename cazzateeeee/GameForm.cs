@@ -80,9 +80,11 @@ namespace cazzateeeee
                     // mostro all' utente la mossa
                     btn.Text = $"{gm.GetTurno()}";
 
-                    using (var won = gm.CheckWin())
+                    FileManager.Write($"{gm.GetTurno()} {NumeriTag[0]}{NumeriTag[1]}{NumeriTag[2]}");
+
+                    if (gm.CheckWin() != '-')
                     {
-                        MessageBox.Show($"{won} ha vinto! ");
+                        MessageBox.Show($"{gm.CheckWin()} ah vinto");
                     }
 
                     // cambio il turno per il programma 
