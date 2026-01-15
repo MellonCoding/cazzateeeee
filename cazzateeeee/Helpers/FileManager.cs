@@ -1,18 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO.Pipes;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+/// FILE MANAGER:
+/// - Start: Se il file al percorso "persorso" non esiste lo crea se esiste lo svuta, 
+///          questa funzione deve avere SOLO 1 reference o c'é un problema   
+/// - Write: Prende una stringa e la scrive su file, per ora non ci sono controlli, sarebbe meglio fare qualche controllo in effetti
 
 namespace cazzateeeee
 {
     public static class FileManager
     {
-        private static string percorso = Environment.CurrentDirectory + "/mosse.txt";
+        private static string percorso = Environment.CurrentDirectory + "\\mosse.txt";
 
-        // Scrive una riga nel file, aggiungendola in coda
+        public static bool Start()
+        { 
+            try
+            {
+                // Crea o svuota il file
+                File.WriteAllText(percorso, string.Empty);
+                return true;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+                return false;
+            }
+        }
+
         public static void Write(string testo)
         {
             MessageBox.Show(percorso);

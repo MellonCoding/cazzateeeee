@@ -37,6 +37,12 @@ namespace cazzateeeee
         {
             int BUTTON_SIZE = 30;
 
+            //int OFFSET_TRIS_TO_TRIS = 120, 
+            //    DISTANZA_DAL_MARGINE = 30,
+            //    DISTANZA_TETTO_STRIS = 40;
+            //    Location = new Point(DISTANZA_DAL_MARGINE + (OFFSET_TRIS_TO_TRIS * (num_tris % 3)) + (40 * num_col), 80 + (OFFSET_TRIS_TO_TRIS * y_tris) + (40 * num_row)),
+
+
             for (int num_tris = 0, y_tris = 0; num_tris < 9; num_tris++)
             {
                 for (int num_row = 0; num_row < 3; num_row++)
@@ -49,7 +55,7 @@ namespace cazzateeeee
                         Button btn = new Button
                         {
                             Text = "",
-                            Location = new Point(10 + (120 * (num_tris % 3)) + (40 * num_col), 80 + (120 * y_tris) + (40 * num_row)),
+                            Location = new Point(30 + (120 * (num_tris % 3)) + (40 * num_col), 80 + (120 * y_tris) + (40 * num_row)),
                             Size = new Size(BUTTON_SIZE, BUTTON_SIZE),
                             Tag = $"Tris{num_tris}Row{num_row}Col{num_col}"
                         };
