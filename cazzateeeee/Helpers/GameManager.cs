@@ -14,20 +14,20 @@ namespace cazzateeeee.Helpers
         private Supertris board;    //  il campo da gioco
         private char turno;         // il turno del player corrente
         
-        //private char[,,] virtualBoard;  // board virtuale che si popolerá leggendo dal file
-
         public GameManager() 
         { 
             board = new Supertris();
-            //virtualBoard = new char[9, 3, 3];
-            turno = 'X'; //  statico inizia X bot o persona che sia
+
+            FileManager.Start();
+
+            turno = 'X'; 
         }
 
-        // ---------------- HELPERS --------------------------- vediamo se sta sintassi funziona, se non funzia leviamo
+        // -------------------------------- HELPERS -------------------------------- //
         public char GetTurno() { return turno; }
         public void CambiaTurno() { if (turno == 'X') turno = 'O'; else turno = 'X'; }
 
-        // ---------------- END HELPERS ---------------------------
+        // -------------------------------- END HELPERS ---------------------------- // 
 
 
         public void StartGamePVP()
@@ -71,7 +71,13 @@ namespace cazzateeeee.Helpers
 
         public char CheckWin()
         {
+            char won = board.CheckWin();
 
+            if (won != '-') 
+            {
+                MessageBox.Show($"{won} ha vinto, yeyy!!"); 
+                return won; 
+            }
 
             return '-';
         }

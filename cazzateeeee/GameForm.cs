@@ -6,23 +6,24 @@ namespace cazzateeeee
     public partial class GameForm : Form
     {
         private GameManager gm;
+        private Form genitore;
 
-        public GameForm(int mod)
+        public GameForm(int mod, Form genitore)
         {
             // cose da designer 
             InitializeComponent();
 
             // inizialize la UI, quindi bottoni label e altre cose
             InitializeUI();
-            
+
             // "Creo il gioco"
             gm = new GameManager();
-            
+
             // in base alla modalitá sceltá dal giocatore avvio il gioco senza bot (0) con 1 bot (1) con 2 bot (2)
-            switch (mod) 
+            switch (mod)
             {
                 case 0:
-                    gm.StartGamePVP();  
+                    gm.StartGamePVP();
                     break;
                 case 1:
                     gm.StartGamePVE();
@@ -31,6 +32,8 @@ namespace cazzateeeee
                     gm.StartGameEVE();
                     break;
             }
+
+            this.genitore = genitore;
         }
 
         internal void InitializeUI()
@@ -50,7 +53,7 @@ namespace cazzateeeee
                     for (int num_col = 0; num_col < 3; num_col++)
                     {
                         if (num_tris > 5) y_tris = 2; else if (num_tris > 2) y_tris = 1; else y_tris = 0;
-            
+
                         // crea bottone
                         Button btn = new Button
                         {
@@ -61,13 +64,13 @@ namespace cazzateeeee
                         };
 
                         // aggiungi ai sender e dai il metodo mossa
-                        btn.Click += Mossa; 
+                        btn.Click += Mossa;
                         Controls.Add(btn);
                     }
-                }   
+                }
             }
         }
-        
+
         private void Mossa(object? sender, EventArgs e)
         {
             if (sender is Button btn)
@@ -101,6 +104,11 @@ namespace cazzateeeee
             {
                 MessageBox.Show("Ci e' stato un problema socio, riavvia, se persiste flamma mellon");
             }
+        }
+
+        private void GameForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            genitore.Close();
         }
     }
 }

@@ -24,21 +24,21 @@ namespace cazzateeeee
 
         private void btnPlayerPlayer_Click(object sender, EventArgs e)
         {
-            GameForm gf = new GameForm(PLAYERvsPLAYERmod);
+            GameForm gf = new GameForm(PLAYERvsPLAYERmod, this);
             gf.Show();
             this.Hide();
         }
 
         private void btnPlayerBot_Click(object sender, EventArgs e)
         {
-            GameForm gf = new GameForm(PLAYERvsBOTmod);
+            GameForm gf = new GameForm(PLAYERvsBOTmod, this);
             gf.Show();
             this.Hide();
         }
 
         private void btnBotBot_Click(object sender, EventArgs e)
         {
-            GameForm gf = new GameForm(BOTvsBOTmod);
+            GameForm gf = new GameForm(BOTvsBOTmod, this);
             gf.Show();
             this.Hide();
         }

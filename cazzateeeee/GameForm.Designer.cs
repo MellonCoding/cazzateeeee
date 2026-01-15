@@ -34,9 +34,10 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(414, 460);
+            ClientSize = new Size(414, 461);
             Name = "GameForm";
             Text = "Supertris";
+            FormClosing += GameForm_FormClosing;
             ResumeLayout(false);
         }
 

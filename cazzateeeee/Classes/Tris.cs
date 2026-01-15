@@ -14,6 +14,7 @@ namespace cazzateeeee.Classes
         public Tris()
         {
             miniBoard = new char[3, 3];
+            winner = '-';
 
             for (int row = 0; row < 3; row++)
             {
@@ -24,7 +25,11 @@ namespace cazzateeeee.Classes
             }
         }
 
+        // -------------------------------- HELPERS -------------------------------- //
+
         public char wonBy() { return winner; }
+
+        // -------------------------------- END HELPERS ---------------------------- // 
 
         public bool MakeMove(char player, char row, char col)
         {
@@ -59,7 +64,7 @@ namespace cazzateeeee.Classes
 
             int x = 0, y = 0;
 
-            won = miniBoard[x, y] == miniBoard[x+1, y+1] && miniBoard[x+1, y+1] == miniBoard[x, y] ? miniBoard[x, y] : won;
+            won = miniBoard[x, y] == miniBoard[x+1, y+1] && miniBoard[x+1, y+1] == miniBoard[x+2, y+2] ? miniBoard[x, y] : won;
 
             y += 2;
 
