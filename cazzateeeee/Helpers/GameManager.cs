@@ -11,7 +11,8 @@ namespace cazzateeeee.Helpers
 {
     internal class GameManager
     {
-        private Supertris board;    //  il campo da gioco
+        private Supertris board;    // il campo da gioco
+        private char nextTris;      // prossimo tris
         private char turno;         // il turno del player corrente
         
         public GameManager() 
@@ -20,10 +21,12 @@ namespace cazzateeeee.Helpers
 
             FileManager.Start();
 
-            turno = 'X'; 
+            turno = 'X';
+            nextTris = '-';
         }
 
         // -------------------------------- HELPERS -------------------------------- //
+
         public char GetTurno() { return turno; }
         public void CambiaTurno() { if (turno == 'X') turno = 'O'; else turno = 'X'; }
 
@@ -63,10 +66,41 @@ namespace cazzateeeee.Helpers
 
         }
 
-        public bool MakeMove(char tris, char row, char col) 
+        public bool MakeMove(char tris, char row, char col)
         {
-            // DA DELEGARE FileManager.Write($"{turno} {tris}{row}{col}");
-            return board.MakeMove(turno, tris, row, col);
+
+            int vRow = Convert.ToInt16(row), vCol = Convert.ToInt16(col);
+            char vTris = Convert.ToChar((vRow + vCol + (vRow * 2) + 48) / 4);
+
+            if (nextTris == '-')
+            {
+                if (board.MakeMove(turno, tris, row, col))
+                {
+                    nextTris = vTris;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (nextTris == vTris)
+                {
+                    if (board.MakeMove(turno, tris, row, col))
+                    {
+                        nextTris = vTris;
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return false;
         }
 
         public char CheckWin()
