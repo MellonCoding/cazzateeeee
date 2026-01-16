@@ -1,20 +1,24 @@
 using cazzateeeee.Classes;
 using cazzateeeee.Helpers;
+using System.Threading.Tasks.Dataflow;
 
 namespace cazzateeeee
 {
     public partial class GameForm : Form
     {
+        private readonly ThemeManager _theme = new ThemeManager(Theme.Dark());
         private GameManager gm;
         private Form genitore;
 
-        public GameForm(int mod, Form genitore)
+        public GameForm(int mod, Form genitore, ThemeManager tm)
         {
             // cose da designer 
             InitializeComponent();
+            _theme = tm;
 
             // inizialize la UI, quindi bottoni label e altre cose
             InitializeUI();
+            _theme.Apply(this);
 
             // "Creo il gioco"
             gm = new GameManager();
@@ -73,15 +77,20 @@ namespace cazzateeeee
 
         private void Mossa(object? sender, EventArgs e)
         {
-            if (sender is Button btn)
+            if (sender is Button btn && sender != null)
             {
                 string Tag = btn.Tag.ToString();
-                string NumeriTag = "";
+                int i = 0;
+                int[] NumeriTag = new int[3];
+                char won;
 
                 foreach (char c in Tag)
                 {
                     if (char.IsDigit(c))
-                        NumeriTag += c;
+                    { 
+                        NumeriTag[i] = (int.Parse(c.ToString()));
+                        i++;
+                    }
                 }
 
                 if (gm.MakeMove(NumeriTag[0], NumeriTag[1], NumeriTag[2]))
@@ -90,10 +99,12 @@ namespace cazzateeeee
                     btn.Text = $"{gm.GetTurno()}";
 
                     FileManager.Write($"{gm.GetTurno()} {NumeriTag[0]}{NumeriTag[1]}{NumeriTag[2]}");
-
-                    if (gm.CheckWin() != '-')
+                    
+                    won = gm.CheckWin();
+                    
+                    if (won != '-')
                     {
-                        MessageBox.Show($"{gm.CheckWin()} ah vinto");
+                        MessageBox.Show($"{won} ah vinto");
                     }
 
                     // cambio il turno per il programma 

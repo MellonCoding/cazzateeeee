@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,10 +10,12 @@ namespace cazzateeeee.Classes
     internal class Supertris
     {
         private Tris[,] board;
+        private char winner;
 
         public Supertris() 
         {
             board = new Tris[3, 3];
+            winner = '-';
 
             for (int row = 0; row < 3; row++)
             {
@@ -28,22 +31,28 @@ namespace cazzateeeee.Classes
 
 
         // -------------------------------- END HELPERS ---------------------------- // 
-        public bool MakeMove(char player, char tris, char row, char col)
+        public bool MakeMove(char player, int tris, int row, int col)
         {
-            int COSODELLEOPERAZIONI = Convert.ToInt32(tris) - 48; // trasformo da char a int, c'é un modo migliore, si, lo conosco, probabilemente
-            int colCount = COSODELLEOPERAZIONI % 3;
-            int rawCount = 0;
-
-            while (COSODELLEOPERAZIONI > 2)
+            if (winner == '-')
             {
-                COSODELLEOPERAZIONI -= 3;
-                rawCount++;
+                int colCount = tris % 3;
+                int rawCount = 0;
+
+                while (tris > 2)
+                {
+                    tris -= 3;
+                    rawCount++;
+                }
+
+                char won = board[rawCount, colCount].CheckWin();
+                if (won != '-') MessageBox.Show($"{won}");
+
+                return board[rawCount, colCount].MakeMove(player, row, col);
             }
-
-            char won = board[rawCount, colCount].CheckWin();
-             if (won != '-') MessageBox.Show($"{won}");
-
-            return board[rawCount, colCount].MakeMove(player, row, col);
+            else
+            {
+                return false;
+            }
         }
 
         public char CheckWin()
@@ -70,6 +79,10 @@ namespace cazzateeeee.Classes
 
             won = board[x, y].wonBy() == board[x + 1, y - 1].wonBy() && board[x + 1, y - 1].wonBy() == board[x + 2, y - 2].wonBy() ? board[x, y].wonBy() : won;
 
+            winner = won;
+            
+            Console.WriteLine("Supertris winner: " + won);
+            
             return won;
         }
     }

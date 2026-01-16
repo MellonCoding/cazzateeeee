@@ -12,7 +12,7 @@ namespace cazzateeeee.Helpers
     internal class GameManager
     {
         private Supertris board;    // il campo da gioco
-        private char nextTris;      // prossimo tris
+        private int nextTris;       // prossimo tris
         private char turno;         // il turno del player corrente
         
         public GameManager() 
@@ -66,17 +66,15 @@ namespace cazzateeeee.Helpers
 
         }
 
-        public bool MakeMove(char tris, char row, char col)
+        public bool MakeMove(int tris, int row, int col)
         {
-
-            int vRow = Convert.ToInt16(row), vCol = Convert.ToInt16(col);
-            char vTris = Convert.ToChar((vRow + vCol + (vRow * 2) + 48) / 4);
+            var vtris = row + col + row * 2;
 
             if (nextTris == '-')
             {
                 if (board.MakeMove(turno, tris, row, col))
                 {
-                    nextTris = vTris;
+                    nextTris = vtris;
                     return true;
                 }
                 else
@@ -86,11 +84,11 @@ namespace cazzateeeee.Helpers
             }
             else
             {
-                if (nextTris == vTris)
+                if (nextTris == tris)
                 {
                     if (board.MakeMove(turno, tris, row, col))
                     {
-                        nextTris = vTris;
+                        nextTris = vtris;
                         return true;
                     }
                     else
@@ -106,13 +104,7 @@ namespace cazzateeeee.Helpers
         public char CheckWin()
         {
             char won = board.CheckWin();
-
-            if (won != '-') 
-            {
-                MessageBox.Show($"{won} ha vinto, yeyy!!"); 
-                return won; 
-            }
-
+            Console.WriteLine("gm winner " + won);
             return '-';
         }
     }

@@ -31,11 +31,10 @@ namespace cazzateeeee.Classes
 
         // -------------------------------- END HELPERS ---------------------------- // 
 
-        public bool MakeMove(char player, char row, char col)
+        public bool MakeMove(char player, int row, int col)
         {
             if (winner != '-') return false;
 
-            row -= (char)48; col -= (char)48; 
             // CHECK QUI; qui CheckWin fa i conrolli e ritorna il char del vincente, ti va bene? becuse possimao anche fare che se la mossa e' valida
             // la fa e se vede che qualcuno ha vinto allora ritrono player, vedi se ti torna utile per qualcosa
             
@@ -71,7 +70,7 @@ namespace cazzateeeee.Classes
             won = miniBoard[x, y] == miniBoard[x + 1, y - 1] && miniBoard[x + 1, y - 1] == miniBoard[x + 2, y - 2] ? miniBoard[x, y] : won;
 
             winner = won;
-
+            Console.WriteLine("Tris winner: " + won);
             return won;
         }
     }
