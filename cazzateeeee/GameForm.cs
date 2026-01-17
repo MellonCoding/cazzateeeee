@@ -95,12 +95,15 @@ namespace cazzateeeee
                 if (gm.MakeMove(NumeriTag[0], NumeriTag[1], NumeriTag[2]))
                 {
                     // mostro all' utente la mossa
-                    btn.Text = $"{gm.GetTurno()}";
+                    btn.Text = gm.GetTurno().ToString();
 
+                    // controllo se qualcuno ha vinto
+                    won = gm.CheckWin();
+
+                    // scrivo su file la mossa
                     FileManager.Write($"{gm.GetTurno()} {NumeriTag[0]}{NumeriTag[1]}{NumeriTag[2]}");
                     
-                    won = gm.CheckWin();
-                    
+                    // se qualcuno vince lo mostro
                     if (won != '-')
                     {
                         MessageBox.Show($"{won} ah vinto");

@@ -7,13 +7,16 @@ namespace cazzateeeee.Helpers
         private Supertris board;    // il campo da gioco
         private int nextTris;       // prossimo tris
         private char turno;         // il turno del player corrente
-        
+        private bool pve;           // se sono in modalita' con i bot
+        public event Action<char>? MoveCompleted; // char = chi ha mosso (X/O)
+
         public GameManager() 
         { 
+            // creo la board del supertris
             board = new Supertris();
-
+            // creo il file mossa.txt
             FileManager.Start();
-
+            // 
             turno = 'X';
             nextTris = '-';
         }
@@ -27,71 +30,76 @@ namespace cazzateeeee.Helpers
 
 
         public void StartGamePVP()
-        { 
-            // mod se mod player v player
-
-             // Turno player X
-                // makeMove chiamata dal bottone
-                // MakeMove prende la posizione del bottone e scrive su file
-            
-
+        {
+            pve = false;
+            turno = 'X';
+            nextTris = '-';
         }
 
         public void StartGamePVE()
         {
-            // mod se mod player v player
-
-            // Turno player X
-            // makeMove chiamata dal bottone
-            // MakeMove prende la posizione del bottone e scrive su file
-
-
+            pve = true;
+            turno = 'X';
+            nextTris = '-';
         }
 
         public void StartGameEVE()
         {
-            // mod se mod player v player
-
-            // Turno player X
-            // makeMove chiamata dal bottone
-            // MakeMove prende la posizione del bottone e scrive su file
-
-
+            pve = true;
+            turno = 'X';
+            nextTris = '-';
         }
 
         public bool MakeMove(int tris, int row, int col)
         {
             var vtris = row + col + row * 2;
 
+            bool mossaFatta = false;
+
             if (nextTris == '-')
             {
-                if (board.MakeMove(turno, tris, row, col))
-                {
-                    nextTris = vtris;
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                mossaFatta = board.MakeMove(turno, tris, row, col);
+
+
+                //if (board.MakeMove(turno, tris, row, col))
+                //{
+                //    nextTris = vtris;
+                //    return true;
+                //}
+                //else
+                //{
+                //    return false;
+                //}
             }
             else
             {
                 if (nextTris == tris)
-                {
-                    if (board.MakeMove(turno, tris, row, col))
-                    {
-                        nextTris = vtris;
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
+                    mossaFatta = board.MakeMove(turno, tris, row, col);
+                else
+                    mossaFatta = false;
+
+                //if (nextTris == tris)
+                //{
+                //    if (board.MakeMove(turno, tris, row, col))
+                //    {
+                //        nextTris = vtris;
+                //        return true;
+                //    }
+                //    else
+                //    {
+                //        return false;
+                //    }
+                //}
             }
 
-            return false;
+            if (!mossaFatta) return false;
+
+            nextTris = vtris;
+
+            // notifica: la mossa valida è stata fatta
+            MoveCompleted?.Invoke(turno);
+
+            return true;
         }
 
         public char CheckWin()
