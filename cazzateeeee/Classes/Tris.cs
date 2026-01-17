@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace cazzateeeee.Classes
+﻿namespace cazzateeeee.Classes
 {
     internal class Tris
     {
