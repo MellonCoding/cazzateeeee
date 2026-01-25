@@ -8,7 +8,7 @@ namespace cazzateeeee.Helpers
         private int nextTris;       // prossimo tris
         private char turno;         // il turno del player corrente
         private bool pve;           // se sono in modalita' con i bot
-        public event Action<char>? MoveCompleted; // char = chi ha mosso (X/O)
+        private bool mossaFatta;
 
         public GameManager() 
         { 
@@ -18,7 +18,8 @@ namespace cazzateeeee.Helpers
             FileManager.Start();
             // 
             turno = 'X';
-            nextTris = '-';
+            nextTris = -1;
+            mossaFatta = false;
         }
 
         // -------------------------------- HELPERS -------------------------------- //
@@ -33,74 +34,67 @@ namespace cazzateeeee.Helpers
         {
             pve = false;
             turno = 'X';
-            nextTris = '-';
+            nextTris = -1;
         }
 
         public void StartGamePVE()
         {
             pve = true;
             turno = 'X';
-            nextTris = '-';
+            nextTris = -1;
         }
 
         public void StartGameEVE()
         {
             pve = true;
             turno = 'X';
-            nextTris = '-';
+            nextTris = -1;
         }
 
         public bool MakeMove(int tris, int row, int col)
         {
-            var vtris = row + col + row * 2;
+            // per fare indexing dell'array 2d devo trasformare il numero in 2 numeri che rappresentino
+            // il tris sotto forma di X e Y
 
-            bool mossaFatta = false;
-
-            if (nextTris == '-')
+            // calcolo che colonna del tris (miniBoard)
+            int vtris = tris;
+            int COL_COUNT = tris % 3;
+            int ROW_COUNT = 0;
+            // e anche la riga del tris (miniBoard)
+            while (vtris > 2)
             {
-                mossaFatta = board.MakeMove(turno, tris, row, col);
+                vtris -= 3;
+                ROW_COUNT++;
+            }
 
+            vtris = row + col + row * 2;
 
-                //if (board.MakeMove(turno, tris, row, col))
-                //{
-                //    nextTris = vtris;
-                //    return true;
-                //}
-                //else
-                //{
-                //    return false;
-                //}
+            mossaFatta = false;
+
+            if (nextTris == -1)
+            {
+                nextTris = vtris;
+                mossaFatta = board.MakeMove(turno, ROW_COUNT, COL_COUNT, row, col);
             }
             else
             {
                 if (nextTris == tris)
-                    mossaFatta = board.MakeMove(turno, tris, row, col);
+                {
+                    nextTris = vtris;
+                    mossaFatta = board.MakeMove(turno, ROW_COUNT, COL_COUNT, row, col);
+                }
                 else
+                {
                     mossaFatta = false;
-
-                //if (nextTris == tris)
-                //{
-                //    if (board.MakeMove(turno, tris, row, col))
-                //    {
-                //        nextTris = vtris;
-                //        return true;
-                //    }
-                //    else
-                //    {
-                //        return false;
-                //    }
-                //}
+                }
             }
 
             if (!mossaFatta) return false;
 
-            nextTris = vtris;
-
-            // notifica: la mossa valida è stata fatta
-            MoveCompleted?.Invoke(turno);
-
             return true;
         }
+
+        
 
         public char CheckWin()
         {

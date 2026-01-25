@@ -5,6 +5,7 @@
         private char[,] miniBoard;
         private char winner;
 
+        // creo il tris e segno che nessuna ha vinto (winner = '-') 
         public Tris()
         {
             miniBoard = new char[3, 3];
@@ -14,7 +15,7 @@
             {
                 for (int col = 0; col < 3; col++)
                 {
-                    miniBoard[row, col] = '-';
+                    miniBoard[row, col] = winner;
                 }
             }
         }
@@ -27,45 +28,43 @@
 
         public bool MakeMove(char player, int row, int col)
         {
-            if (winner != '-') return false;
-
-            // CHECK QUI; qui CheckWin fa i conrolli e ritorna il char del vincente, ti va bene? becuse possimao anche fare che se la mossa e' valida
-            // la fa e se vede che qualcuno ha vinto allora ritrono player, vedi se ti torna utile per qualcosa
-            
-            if (miniBoard[row, col] == '-') miniBoard[row, col] = player;
-            else return false;
-
-            return true;
+            if (miniBoard[row, col] != '-' || winner != '-')
+            {
+                return false;
+            }
+            else
+            {
+                // CHECK QUI; qui CheckWin fa i conrolli e ritorna il char del vincente, ti va bene? becuse possimao anche fare che se la mossa e' valida
+                // la fa e se vede che qualcuno ha vinto allora ritrono player, vedi se ti torna utile per qualcosa
+                miniBoard[row, col] = player;
+                return true;
+            }
         }
 
         public char CheckWin()
         { 
-            // DA RIVEDERE
-            char won = '-';
-
             for (int row = 0; row < 3; row++)
             {
-                if (won != '-') continue;
-                won = miniBoard[row, 0] == miniBoard[row, 1] && miniBoard[row, 1] == miniBoard[row, 2] ? miniBoard[row, 0] : won;
+                if (winner != '-') continue;
+                winner = miniBoard[row, 0] == miniBoard[row, 1] && miniBoard[row, 1] == miniBoard[row, 2] ? miniBoard[row, 0] : winner;
             }
 
             for (int col = 0; col < 3; col++)
             {
-                if (won != '-') continue;
-                won = miniBoard[0, col] == miniBoard[1, col] && miniBoard[1, col] == miniBoard[2, col] ? miniBoard[0, col] : won;
+                if (winner != '-') continue;
+                winner = miniBoard[0, col] == miniBoard[1, col] && miniBoard[1, col] == miniBoard[2, col] ? miniBoard[0, col] : winner;
             }
 
             int x = 0, y = 0;
 
-            won = miniBoard[x, y] == miniBoard[x+1, y+1] && miniBoard[x+1, y+1] == miniBoard[x+2, y+2] ? miniBoard[x, y] : won;
+            winner = miniBoard[x, y] == miniBoard[x+1, y+1] && miniBoard[x+1, y+1] == miniBoard[x+2, y+2] ? miniBoard[x, y] : winner;
 
             y += 2;
 
-            won = miniBoard[x, y] == miniBoard[x + 1, y - 1] && miniBoard[x + 1, y - 1] == miniBoard[x + 2, y - 2] ? miniBoard[x, y] : won;
+            winner = miniBoard[x, y] == miniBoard[x + 1, y - 1] && miniBoard[x + 1, y - 1] == miniBoard[x + 2, y - 2] ? miniBoard[x, y] : winner;
 
-            winner = won;
-            Console.WriteLine("Tris winner: " + won);
-            return won;
+            Console.WriteLine("Tris winner: " + winner);
+            return winner;
         }
     }
 }
