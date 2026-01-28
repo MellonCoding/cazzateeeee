@@ -5,19 +5,16 @@ namespace cazzateeeee
 {
     public partial class GameForm : Form
     {
-        private readonly ThemeManager _theme = new ThemeManager(Theme.Dark());
         private GameManager gm;
-        private Form genitore;
+        private Form FormInizale;
 
-        public GameForm(int mod, Form genitore, ThemeManager tm)
+        public GameForm(int mod, Form SelectionForm, ThemeManager tm)
         {
             // cose da designer 
             InitializeComponent();
-            _theme = tm;
 
             // inizialize la UI, quindi bottoni label e altre cose
             InitializeUI();
-            _theme.Apply(this);
 
             // "Creo il gioco"
             gm = new GameManager();
@@ -36,7 +33,7 @@ namespace cazzateeeee
                     break;
             }
 
-            this.genitore = genitore;
+            this.FormInizale = SelectionForm;
         }
 
         internal void InitializeUI()
@@ -78,7 +75,7 @@ namespace cazzateeeee
         {
             if (sender is Button btn && sender != null)
             {
-                string Tag = btn.Tag.ToString();
+                string Tag = btn.Tag.ToString(); 
                 int i = 0;
                 int[] NumeriTag = new int[3];
                 char won;
@@ -92,7 +89,7 @@ namespace cazzateeeee
                     }
                 }
 
-                if (gm.MakeMove(NumeriTag[0], NumeriTag[1], NumeriTag[2]))
+                if (gm.MakeMove(NumeriTag[0], NumeriTag[1], NumeriTag[2])) //8 0 0 
                 {
                     // mostro all' utente la mossa
                     btn.Text = gm.GetTurno().ToString();
@@ -121,7 +118,7 @@ namespace cazzateeeee
 
         private void GameForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            genitore.Close();
+            FormInizale.Close();
         }
     }
 }

@@ -34,10 +34,14 @@
             {
                 // Debug: Questa parte serve a capire secondo il programma chi ha vinto su un tris
                 char won = arrayOfMiniBoard[trisX, trisY].CheckWin();
-                // if (won != '-') MessageBox.Show($"{won}");
+                if (won != '-') { MessageBox.Show($"{won}"); }
 
                 // ritorno se la mossa nel tris (miniBoard(row, col)) nella posizione [TrisX, TrisX] e' valida o meno
-                return arrayOfMiniBoard[trisX, trisY].MakeMove(player, row, col);
+                bool debug = arrayOfMiniBoard[trisX, trisY].MakeMove(player, row, col);
+
+                won = arrayOfMiniBoard[trisX, trisY].CheckWin();
+
+                return debug;
             }
             else
             {
@@ -89,6 +93,12 @@
             
             // ritorno chi ha vinto
             return winner;
+        }
+
+        public bool CheckWinMiniBoard(int row, int col)
+        {
+           //       se il controllo vittoria non é '-' qualcuno ha vinto
+           return arrayOfMiniBoard[row, col].CheckWin() != '-' ? true : false;
         }
     }
 }
