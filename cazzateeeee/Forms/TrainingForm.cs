@@ -41,8 +41,8 @@ namespace cazzateeeee.Forms
             InitializeComponent();
             InitializeUI();
 
-            bot = new AlberoPesato();
-            trainer = new Trainer(bot, new RandomBot());
+            bot = new AlberoPesato(false);
+            trainer = new Trainer(bot, new AlberoPesato(true));
             allenamentoInCorso = false;
 
             AggiornaStatistiche(0, 0, 0, 0);
@@ -172,7 +172,7 @@ namespace cazzateeeee.Forms
 
             Label lblControlli = new Label
             {
-                Text = "💡 Il bot impara giocando contro un bot casuale",
+                Text = "💡 Il bot impara giocando contro un albero pesato",
                 Location = new Point(10, 45),
                 Size = new Size(640, 20),
                 Font = new Font("Segoe UI", 9, FontStyle.Italic),
@@ -382,7 +382,7 @@ namespace cazzateeeee.Forms
 
             if (result == DialogResult.Yes)
             {
-                bot = new AlberoPesato();
+                bot = new AlberoPesato(false);
                 trainer = new Trainer(bot, new RandomBot());
                 AggiornaStatistiche(0, 0, 0, 0);
                 progressBar.Value = 0;
@@ -397,10 +397,5 @@ namespace cazzateeeee.Forms
             txtLog.SelectionStart = txtLog.Text.Length;
             txtLog.ScrollToCaret();
         }
-
-        //public AlberoPesato GetBotAllenato()
-        //{
-        //    return bot;
-        //}
     }
 }

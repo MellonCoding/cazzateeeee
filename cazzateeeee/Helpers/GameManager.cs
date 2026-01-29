@@ -107,5 +107,10 @@ namespace cazzateeeee.Helpers
         {
             return board.CheckWin();
         }
+
+        internal string GetBoardState()
+        {
+            return board.GetBoardState();
+        }
     }
 }

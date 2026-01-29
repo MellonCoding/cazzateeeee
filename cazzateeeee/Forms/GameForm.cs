@@ -9,12 +9,15 @@ namespace cazzateeeee
         private GameManager gm;
         private Form FormIniziale;
         private Button[,] buttons;  // Array per accesso rapido ai bottoni
+        private Panel[] panels;     // Array per i panel dei tris
         private Label lblTurno;
         private Label lblInfo;
-        private int bot;            // se bot é utilizzato 1 = AlberoPesato 2 = Algoritmico
-        private AlberoPesato botAllenato;
+        private int modalitaGioco;  // 0 = PVP, 1 = PVE, 2 = EVE
+        private int tipoBot;        // 1 = AlberoPesato, 2 = Algoritmico
+        private AlberoPesato? botAllenato;
+        private bool botInPensiero; // Previene input durante il turno del bot
         private ColorManager colorManager = new ColorManager();
-            
+        private string PathVersoPesi = System.AppDomain.CurrentDomain.BaseDirectory + "supertris_bot.weights";
         public GameForm(int mod, Form SelectionForm, int modBot)
         {
             InitializeComponent();
@@ -24,39 +27,49 @@ namespace cazzateeeee
             StartPosition = FormStartPosition.CenterScreen;
 
             buttons = new Button[9, 9];  // 9 mini-tris, ognuno con 9 celle
+            panels = new Panel[9];       // 9 panel (uno per ogni mini-tris)
 
             InitializeUI();
 
             gm = new GameManager();
-            bot = modBot;
+            modalitaGioco = mod;
+            tipoBot = modBot;
+            botInPensiero = false;
 
             switch (mod)
             {
-                case 0:
+                case 0: // PVP
                     gm.StartGamePVP();
                     break;
-                case 1:
+                case 1: // PVE - Player vs Bot
                     gm.StartGamePVE();
-                    if (bot == 1)
+                    if (tipoBot == 1)
                     {
-                        botAllenato = new AlberoPesato();
-                        botAllenato.CaricaPesi("supertris_bot.weights");
+                        botAllenato = new AlberoPesato(false);
+                        if (File.Exists(PathVersoPesi))
+                        {
+                            botAllenato.CaricaPesi(PathVersoPesi);
+                            MessageBox.Show("Sex");
+                        }
                     }
                     else
-                    { 
-                        // qui ci va il bot algoritmico
+                    {
+                        // TODO: bot algoritmico
                     }
                     break;
-                case 2:
+                case 2: // EVE - Bot vs Bot
                     gm.StartGameEVE();
-                    if (bot == 1)
+                    if (tipoBot == 1)
                     {
-                        botAllenato = new AlberoPesato();
-                        botAllenato.CaricaPesi("supertris_bot.weights");
+                        botAllenato = new AlberoPesato(false);
+                        if (File.Exists("supertris_bot.weights"))
+                        {
+                            botAllenato.CaricaPesi("supertris_bot.weights");
+                        }
                     }
                     else
                     {
-                        // qui ci va il bot algoritmico
+                        // TODO: bot algoritmico
                     }
                     break;
             }
@@ -115,6 +128,7 @@ namespace cazzateeeee
                     Tag = $"Panel{numTris}"
                 };
                 Controls.Add(trisPanel);
+                panels[numTris] = trisPanel;  // Salva riferimento al panel
 
                 // Crea i 9 bottoni del mini-tris
                 for (int row = 0; row < 3; row++)
@@ -186,23 +200,22 @@ namespace cazzateeeee
             // Evidenzia i tris disponibili
             for (int i = 0; i < 9; i++)
             {
-                Panel? panel = Controls.Find($"Panel{i}", false).FirstOrDefault() as Panel;
-                if (panel != null)
+                if (panels[i] != null)
                 {
                     if (prossimoTris == -1)
                     {
                         // Mossa libera - tutti i tris disponibili
-                        panel.BackColor = colorManager.coloreTrisNormale;
+                        panels[i].BackColor = colorManager.coloreTrisNormale;
                     }
                     else if (i == prossimoTris)
                     {
                         // Questo è il tris dove si deve giocare
-                        panel.BackColor = colorManager.coloreTrisAttivo;
+                        panels[i].BackColor = colorManager.coloreTrisAttivo;
                     }
                     else
                     {
                         // Tris non disponibile
-                        panel.BackColor = colorManager.coloreTrisCompletato;
+                        panels[i].BackColor = colorManager.coloreTrisCompletato;
                     }
                 }
             }
@@ -210,6 +223,9 @@ namespace cazzateeeee
 
         private void Mossa(object? sender, EventArgs e)
         {
+            // Previeni click durante il turno del bot
+            if (botInPensiero) return;
+
             if (sender is not Button btn)
             {
                 MessageBox.Show("Errore interno del gioco. Riavvia l'applicazione.");
@@ -249,32 +265,7 @@ namespace cazzateeeee
                 char vincitore = gm.CheckWin();
                 if (vincitore != '-')
                 {
-                    string nomeVincitore = vincitore == 'X' ? "X" : "O";
-                    Color coloreVincitore = vincitore == 'X' ? colorManager.coloreX : colorManager.coloreO;
-
-                    lblInfo.Text = $"🎉 {nomeVincitore} ha vinto! 🎉";
-                    lblInfo.ForeColor = coloreVincitore;
-                    lblInfo.Font = new Font("Segoe UI", 12, FontStyle.Bold);
-
-                    MessageBox.Show(
-                        $"Complimenti! {nomeVincitore} ha vinto la partita!",
-                        "Fine Partita",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information
-                    );
-
-                    // Disabilita tutti i bottoni
-                    foreach (Control ctrl in Controls)
-                    {
-                        if (ctrl is Panel panel)
-                        {
-                            foreach (Control btnCtrl in panel.Controls)
-                            {
-                                if (btnCtrl is Button b)
-                                    b.Enabled = false;
-                            }
-                        }
-                    }
+                    GestioneVittoria(vincitore);
                     return;
                 }
 
@@ -283,6 +274,12 @@ namespace cazzateeeee
 
                 // Aggiorna visualizzazione
                 AggiornaVisualizzazione();
+
+                // Se è il turno del bot, fallo giocare
+                if (DeveGiocareilBot())
+                {
+                    EseguiTurnoBot();
+                }
             }
             else
             {
@@ -290,7 +287,7 @@ namespace cazzateeeee
                 lblInfo.Text = "❌ Mossa non valida! Controlla dove puoi giocare.";
                 lblInfo.ForeColor = Color.FromArgb(255, 100, 100);
 
-                // Animazione shake del bottone (opzionale)
+                // Animazione shake del bottone
                 Task.Run(async () =>
                 {
                     for (int i = 0; i < 3; i++)
@@ -301,6 +298,104 @@ namespace cazzateeeee
                         btn.Invoke(() => btn.BackColor = Color.FromArgb(55, 55, 58));
                     }
                 });
+            }
+        }
+
+        private bool DeveGiocareilBot()
+        {
+            // In PVE, il bot gioca come O
+            if (modalitaGioco == 1 && gm.GetTurno() == 'O')
+                return true;
+
+            // In EVE, i bot giocano sempre (per ora solo implementato per un bot)
+            // TODO: implementare EVE completamente
+
+            return false;
+        }
+
+        private async void EseguiTurnoBot()
+        {
+            botInPensiero = true;
+
+            // Piccolo delay per rendere più naturale
+            await Task.Delay(500);
+
+            string boardState = gm.GetBoardState();
+            int trisObb = gm.GetProssimaTrisObbligatoria();
+
+            var mossa = botAllenato?.CalcolaMossa(boardState, trisObb, gm.GetTurno());
+
+            if (mossa.HasValue)
+            {
+                int numTris = mossa.Value.numTris;
+                int row = mossa.Value.row;
+                int col = mossa.Value.col;
+
+                if (gm.MakeMove(numTris, row, col))
+                {
+                    // Aggiorna il bottone visivamente
+                    int buttonIndex = row * 3 + col;
+                    if (buttons[numTris, buttonIndex] != null)
+                    {
+                        Button btn = buttons[numTris, buttonIndex];
+                        char turnoBot = gm.GetTurno();
+
+                        btn.Text = turnoBot.ToString();
+                        btn.ForeColor = turnoBot == 'X' ? colorManager.coloreX : colorManager.coloreO;
+                        btn.Enabled = false;
+                        btn.BackColor = Color.FromArgb(40, 40, 43);
+                    }
+
+                    // Scrivi su file
+                    FileManager.Write($"{gm.GetTurno()} {numTris}{row}{col}");
+
+                    // Controlla vittoria
+                    char vincitore = gm.CheckWin();
+                    if (vincitore != '-')
+                    {
+                        GestioneVittoria(vincitore);
+                        botInPensiero = false;
+                        return;
+                    }
+
+                    // Cambia turno
+                    gm.CambiaTurno();
+
+                    // Aggiorna visualizzazione
+                    AggiornaVisualizzazione();
+                }
+            }
+
+            botInPensiero = false;
+        }
+
+        private void GestioneVittoria(char vincitore)
+        {
+            string nomeVincitore = vincitore.ToString();
+            Color coloreVincitore = vincitore == 'X' ? colorManager.coloreX : colorManager.coloreO;
+
+            lblInfo.Text = $"🎉 {nomeVincitore} ha vinto! 🎉";
+            lblInfo.ForeColor = coloreVincitore;
+            lblInfo.Font = new Font("Segoe UI", 12, FontStyle.Bold);
+
+            MessageBox.Show(
+                $"Complimenti! {nomeVincitore} ha vinto la partita!",
+                "Fine Partita",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information
+            );
+
+            // Disabilita tutti i bottoni
+            for (int i = 0; i < 9; i++)
+            {
+                if (panels[i] != null)
+                {
+                    foreach (Control btnCtrl in panels[i].Controls)
+                    {
+                        if (btnCtrl is Button b)
+                            b.Enabled = false;
+                    }
+                }
             }
         }
 

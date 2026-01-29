@@ -24,11 +24,18 @@ namespace cazzateeeee.AI
         private float decrementoSconfitta = 0.1f;
         private float pesoIniziale = 0.5f; // Peso neutro per mosse mai viste
 
-        public AlberoPesato()
+        public AlberoPesato(bool a_pesi)
         {
             tabellaStati = new Dictionary<string, Dictionary<string, float>>();
             percorsoPartita = new List<(string, string)>();
             random = new Random();
+            if (a_pesi)
+            {
+                if (File.Exists(System.AppDomain.CurrentDomain.BaseDirectory + "supertris_bot.weights"))
+                {
+                    this.CaricaPesi(System.AppDomain.CurrentDomain.BaseDirectory + "supertris_bot.weights");
+                }
+            }
         }
 
         public (int numTris, int row, int col)? CalcolaMossa(string boardState, int trisObbligatoria, char turno)
