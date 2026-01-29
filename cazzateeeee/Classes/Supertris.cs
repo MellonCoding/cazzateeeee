@@ -5,7 +5,7 @@
         private Tris[,] arrayOfMiniBoard;
         private char winner;
 
-        public Supertris() 
+        public Supertris()
         {
             arrayOfMiniBoard = new Tris[3, 3];
             winner = '-';
@@ -21,84 +21,128 @@
 
         // -------------------------------- HELPERS -------------------------------- //
 
-
-
-        // -------------------------------- END HELPERS ---------------------------- // 
-        
-        // Metodo per fare la mossa
-        // Argomenti player: Che player sta cercando di fare la mossa - tris/row/col posizione della mossa nel super tris
-        public bool MakeMove(char player, int trisX, int trisY, int row, int col)
+        /// <summary>
+        /// Ottiene lo stato completo della board come stringa
+        /// Formato: 81 caratteri (9 tris x 9 celle), '-' per vuoto, 'X' o 'O' per occupato
+        /// </summary>
+        public string GetBoardState()
         {
-            // se nessuno ha vinto per ora 
-            if (winner == '-')
+            char[] state = new char[81];
+            int index = 0;
+
+            for (int trisRow = 0; trisRow < 3; trisRow++)
             {
-                // Debug: Questa parte serve a capire secondo il programma chi ha vinto su un tris
-                char won = arrayOfMiniBoard[trisX, trisY].CheckWin();
-                if (won != '-') { MessageBox.Show($"{won}"); }
-
-                // ritorno se la mossa nel tris (miniBoard(row, col)) nella posizione [TrisX, TrisX] e' valida o meno
-                bool debug = arrayOfMiniBoard[trisX, trisY].MakeMove(player, row, col);
-
-                won = arrayOfMiniBoard[trisX, trisY].CheckWin();
-
-                return debug;
+                for (int trisCol = 0; trisCol < 3; trisCol++)
+                {
+                    for (int row = 0; row < 3; row++)
+                    {
+                        for (int col = 0; col < 3; col++)
+                        {
+                            state[index++] = arrayOfMiniBoard[trisRow, trisCol].GetCell(row, col);
+                        }
+                    }
+                }
             }
-            else
-            {
-                // se c'e' gia' un vincitore non lascio fare altre mosse
-                return false;
-            }
+
+            return new string(state);
         }
 
+        /// <summary>
+        /// Controlla se un mini-tris è completato (vinto da qualcuno o pieno)
+        /// </summary>
+        public bool IsTrisCompleted(int trisRow, int trisCol)
+        {
+            // Se qualcuno ha vinto questo tris, è completato
+            if (arrayOfMiniBoard[trisRow, trisCol].wonBy() != '-')
+                return true;
+
+            // Se il tris è pieno (tutte le celle occupate), è completato
+            return arrayOfMiniBoard[trisRow, trisCol].IsFull();
+        }
+
+        // -------------------------------- END HELPERS ---------------------------- // 
+
+        /// <summary>
+        /// Esegue una mossa su un mini-tris specifico
+        /// </summary>
+        public bool MakeMove(char player, int trisRow, int trisCol, int row, int col)
+        {
+            if (winner != '-')
+            {
+                // Se c'è già un vincitore globale, non si possono fare altre mosse
+                return false;
+            }
+
+            // Prova a fare la mossa nel mini-tris specificato
+            return arrayOfMiniBoard[trisRow, trisCol].MakeMove(player, row, col);
+        }
+
+        /// <summary>
+        /// Controlla se c'è un vincitore globale del Super Tris
+        /// </summary>
         public char CheckWin()
         {
-            /*
-            il controllo e' sempre uguale cambiano solo le coordinate, la struttura e' questa -> faro' l'esempio con le righe
-
-            winner = board[x,y].WonBy() == board[x+1,y].WonBy() && board[x+1,y].WonBy() == board[x+2,y].WonBy() ? board[x,y] : winner;
-            il vincitore diventare (winner =) la prima casella che ho controllato (board[row, 0]) se 
-            la prima casella e' uguale alla seconda (board[row, 0].wonBy() == board[row, 1].wonBy()) e
-            la seconda casella e' uguale alle terza (board[row, 1].wonBy() == board[row, 2].wonBy())
-            se questo non succede, allora winner rimane invariato (: winner)
-            */
-
-            // controllo vittoria righe
+            // Controllo vittoria righe
             for (int row = 0; row < 3; row++)
             {
-                // se qualcuno e' ha fatto tris salto i prossimi controlli
-                if (winner != '-') continue;
-                winner = arrayOfMiniBoard[row, 0].wonBy() == arrayOfMiniBoard[row, 1].wonBy() && arrayOfMiniBoard[row, 1].wonBy() == arrayOfMiniBoard[row, 2].wonBy() ? arrayOfMiniBoard[row, 0].wonBy() : winner;
+                if (winner != '-') break;
+
+                char first = arrayOfMiniBoard[row, 0].wonBy();
+                if (first != '-' &&
+                    first == arrayOfMiniBoard[row, 1].wonBy() &&
+                    first == arrayOfMiniBoard[row, 2].wonBy())
+                {
+                    winner = first;
+                }
             }
 
-            // controllo vittoria colonne
+            // Controllo vittoria colonne
             for (int col = 0; col < 3; col++)
             {
-                // se qualcuno e' ha fatto tris salto i prossimi controlli
-                if (winner != '-') continue;
-                winner = arrayOfMiniBoard[0, col].wonBy() == arrayOfMiniBoard[1, col].wonBy() && arrayOfMiniBoard[1, col].wonBy() == arrayOfMiniBoard[2, col].wonBy() ? arrayOfMiniBoard[0, col].wonBy() : winner;
+                if (winner != '-') break;
+
+                char first = arrayOfMiniBoard[0, col].wonBy();
+                if (first != '-' &&
+                    first == arrayOfMiniBoard[1, col].wonBy() &&
+                    first == arrayOfMiniBoard[2, col].wonBy())
+                {
+                    winner = first;
+                }
             }
 
-            // controllo vittoria diagonale verso -> \
-            int x = 0, y = 0;
+            // Controllo diagonale principale (\)
+            if (winner == '-')
+            {
+                char first = arrayOfMiniBoard[0, 0].wonBy();
+                if (first != '-' &&
+                    first == arrayOfMiniBoard[1, 1].wonBy() &&
+                    first == arrayOfMiniBoard[2, 2].wonBy())
+                {
+                    winner = first;
+                }
+            }
 
-            winner = arrayOfMiniBoard[x, y].wonBy() == arrayOfMiniBoard[x + 1, y + 1].wonBy() && arrayOfMiniBoard[x + 1, y + 1].wonBy() == arrayOfMiniBoard[x + 2, y + 2].wonBy() ? arrayOfMiniBoard[x, y].wonBy() : winner;
+            // Controllo diagonale secondaria (/)
+            if (winner == '-')
+            {
+                char first = arrayOfMiniBoard[0, 2].wonBy();
+                if (first != '-' &&
+                    first == arrayOfMiniBoard[1, 1].wonBy() &&
+                    first == arrayOfMiniBoard[2, 0].wonBy())
+                {
+                    winner = first;
+                }
+            }
 
-            y += 2;
-
-            // controllo vittoria diagonale verso -> /
-            winner = arrayOfMiniBoard[x, y].wonBy() == arrayOfMiniBoard[x + 1, y - 1].wonBy() && arrayOfMiniBoard[x + 1, y - 1].wonBy() == arrayOfMiniBoard[x + 2, y - 2].wonBy() ? arrayOfMiniBoard[x, y].wonBy() : winner;
-            
-            // Debug
-            Console.WriteLine("Supertris winner: " + winner);
-            
-            // ritorno chi ha vinto
             return winner;
         }
 
+        /// <summary>
+        /// Controlla se un mini-tris specifico è stato vinto
+        /// </summary>
         public bool CheckWinMiniBoard(int row, int col)
         {
-           //       se il controllo vittoria non é '-' qualcuno ha vinto
-           return arrayOfMiniBoard[row, col].CheckWin() != '-' ? true : false;
+            return arrayOfMiniBoard[row, col].CheckWin() != '-';
         }
     }
 }

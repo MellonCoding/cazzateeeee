@@ -4,117 +4,108 @@ namespace cazzateeeee.Helpers
 {
     internal class GameManager
     {
-        private Supertris board;    // il campo da gioco
-        private int TrisDoveFareMossa;       // prossimo tris
-        private char turno;         // il turno del player corrente
-        private bool pve;           // se sono in modalita' con i bot
-        private bool mossaFatta;
+        private Supertris board;
+        private int prossimaTrisObbligatoria;  // -1 = mossa libera, altrimenti indica il tris dove giocare
+        private char turnoCorrente;
+        private bool pve;
+        private bool mossaValida;
 
-        public GameManager() 
-        { 
-            // creo la board del supertris
+        public GameManager()
+        {
             board = new Supertris();
-            // creo il file mossa.txt
             FileManager.Start();
-            // 
-            turno = 'X';
-            TrisDoveFareMossa = -1;
-            mossaFatta = false;
+            turnoCorrente = 'X';
+            prossimaTrisObbligatoria = -1;  // Prima mossa libera
+            mossaValida = false;
         }
 
         // -------------------------------- HELPERS -------------------------------- //
 
-        public char GetTurno() { return turno; }
-        public void CambiaTurno() { if (turno == 'X') turno = 'O'; else turno = 'X'; }
+        public char GetTurno() => turnoCorrente;
+
+        public void CambiaTurno()
+        {
+            turnoCorrente = turnoCorrente == 'X' ? 'O' : 'X';
+        }
+
+        public int GetProssimaTrisObbligatoria() => prossimaTrisObbligatoria;
 
         // -------------------------------- END HELPERS ---------------------------- // 
-
 
         public void StartGamePVP()
         {
             pve = false;
-            turno = 'X';
-            TrisDoveFareMossa = -1;
+            turnoCorrente = 'X';
+            prossimaTrisObbligatoria = -1;
         }
 
         public void StartGamePVE()
         {
             pve = true;
-            turno = 'X';
-            TrisDoveFareMossa = -1;
+            turnoCorrente = 'X';
+            prossimaTrisObbligatoria = -1;
         }
 
         public void StartGameEVE()
         {
             pve = true;
-            turno = 'X';
-            TrisDoveFareMossa = -1;
+            turnoCorrente = 'X';
+            prossimaTrisObbligatoria = -1;
         }
 
-        public bool MakeMove(int TrisInputMossa, int row, int col)
+        public bool MakeMove(int numTris, int row, int col)
         {
-            // per fare indexing dell'array 2d devo trasformare il numero in 2 numeri che rappresentino
-            // il tris sotto forma di X e Y
+            // Calcolo le coordinate del mini-tris nella griglia 3x3
+            int trisRow = numTris / 3;
+            int trisCol = numTris % 3;
 
-            // calcolo che colonna del tris (miniBoard)
-            int TrisProssimo = TrisInputMossa;
-            int COL_COUNT = TrisInputMossa % 3;
-            int ROW_COUNT = 0;
-            // e anche la riga del tris (miniBoard)
-            while (TrisProssimo > 2)
+            // Calcolo il prossimo tris dove dovrà giocare l'avversario
+            int prossimoNumTris = row * 3 + col;
+
+            mossaValida = false;
+
+            // Controllo se la mossa è valida in base alla tris obbligatoria
+            if (prossimaTrisObbligatoria == -1)
             {
-                TrisProssimo -= 3;
-                ROW_COUNT++;
-            }
-
-            TrisProssimo = row + col + row * 2;
-
-            mossaFatta = false;
-
-            if (TrisDoveFareMossa == -1)
-            {
-                TrisDoveFareMossa = TrisProssimo;
-                mossaFatta = board.MakeMove(turno, ROW_COUNT, COL_COUNT, row, col);
+                // Mossa libera - può giocare ovunque
+                mossaValida = board.MakeMove(turnoCorrente, trisRow, trisCol, row, col);
             }
             else
             {
-                if (TrisDoveFareMossa == TrisInputMossa)
+                // Deve giocare nella tris obbligatoria
+                if (prossimaTrisObbligatoria == numTris)
                 {
-                    TrisDoveFareMossa = TrisProssimo;
-                    mossaFatta = board.MakeMove(turno, ROW_COUNT, COL_COUNT, row, col);
-
+                    mossaValida = board.MakeMove(turnoCorrente, trisRow, trisCol, row, col);
                 }
                 else
                 {
-                    mossaFatta = false;
+                    // Mossa non valida - tris sbagliata
+                    return false;
                 }
             }
 
-            // riutilizzo le variabili per tempo, 
-            TrisInputMossa = TrisProssimo;
-            COL_COUNT = TrisProssimo % 3;
-            ROW_COUNT = 0;
-            // e anche la riga del tris (miniBoard)
-            while (TrisInputMossa > 2)
+            if (!mossaValida) return false;
+
+            // Calcolo coordinate del prossimo mini-tris
+            int prossimoTrisRow = prossimoNumTris / 3;
+            int prossimoTrisCol = prossimoNumTris % 3;
+
+            // FIX PRINCIPALE: Se il prossimo tris è già completato, la mossa diventa libera
+            if (board.IsTrisCompleted(prossimoTrisRow, prossimoTrisCol))
             {
-                TrisInputMossa -= 3;
-                ROW_COUNT++;
+                prossimaTrisObbligatoria = -1;  // Mossa libera!
             }
-
-            if (board.CheckWinMiniBoard(ROW_COUNT, COL_COUNT)) TrisDoveFareMossa = -1;
-
-            if (!mossaFatta) return false;
+            else
+            {
+                prossimaTrisObbligatoria = prossimoNumTris;
+            }
 
             return true;
         }
 
-        
-
         public char CheckWin()
         {
-            char won = board.CheckWin();
-            Console.WriteLine("gm winner " + won);
-            return '-';
+            return board.CheckWin();
         }
     }
 }
