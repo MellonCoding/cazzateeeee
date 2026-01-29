@@ -5,7 +5,7 @@ namespace cazzateeeee.Helpers
     internal class GameManager
     {
         private Supertris board;
-        private int prossimaTrisObbligatoria;  // -1 = mossa libera, altrimenti indica il tris dove giocare
+        private int ProssimoTrisObbligatorio;  // -1 = mossa libera, altrimenti indica il tris dove giocare
         private char turnoCorrente;
         private bool pve;
         private bool mossaValida;
@@ -15,7 +15,7 @@ namespace cazzateeeee.Helpers
             board = new Supertris();
             FileManager.Start();
             turnoCorrente = 'X';
-            prossimaTrisObbligatoria = -1;  // Prima mossa libera
+            ProssimoTrisObbligatorio = -1;  // Prima mossa libera
             mossaValida = false;
         }
 
@@ -28,7 +28,7 @@ namespace cazzateeeee.Helpers
             turnoCorrente = turnoCorrente == 'X' ? 'O' : 'X';
         }
 
-        public int GetProssimaTrisObbligatoria() => prossimaTrisObbligatoria;
+        public int GetProssimaTrisObbligatoria() => ProssimoTrisObbligatorio;
 
         // -------------------------------- END HELPERS ---------------------------- // 
 
@@ -36,21 +36,21 @@ namespace cazzateeeee.Helpers
         {
             pve = false;
             turnoCorrente = 'X';
-            prossimaTrisObbligatoria = -1;
+            ProssimoTrisObbligatorio = -1;
         }
 
         public void StartGamePVE()
         {
             pve = true;
             turnoCorrente = 'X';
-            prossimaTrisObbligatoria = -1;
+            ProssimoTrisObbligatorio = -1;
         }
 
         public void StartGameEVE()
         {
             pve = true;
             turnoCorrente = 'X';
-            prossimaTrisObbligatoria = -1;
+            ProssimoTrisObbligatorio = -1;
         }
 
         public bool MakeMove(int numTris, int row, int col)
@@ -65,7 +65,7 @@ namespace cazzateeeee.Helpers
             mossaValida = false;
 
             // Controllo se la mossa è valida in base alla tris obbligatoria
-            if (prossimaTrisObbligatoria == -1)
+            if (ProssimoTrisObbligatorio == -1)
             {
                 // Mossa libera - può giocare ovunque
                 mossaValida = board.MakeMove(turnoCorrente, trisRow, trisCol, row, col);
@@ -73,7 +73,7 @@ namespace cazzateeeee.Helpers
             else
             {
                 // Deve giocare nella tris obbligatoria
-                if (prossimaTrisObbligatoria == numTris)
+                if (ProssimoTrisObbligatorio == numTris)
                 {
                     mossaValida = board.MakeMove(turnoCorrente, trisRow, trisCol, row, col);
                 }
@@ -93,11 +93,11 @@ namespace cazzateeeee.Helpers
             // FIX PRINCIPALE: Se il prossimo tris è già completato, la mossa diventa libera
             if (board.IsTrisCompleted(prossimoTrisRow, prossimoTrisCol))
             {
-                prossimaTrisObbligatoria = -1;  // Mossa libera!
+                ProssimoTrisObbligatorio = -1;  // Mossa libera!
             }
             else
             {
-                prossimaTrisObbligatoria = prossimoNumTris;
+                ProssimoTrisObbligatorio = prossimoNumTris;
             }
 
             return true;

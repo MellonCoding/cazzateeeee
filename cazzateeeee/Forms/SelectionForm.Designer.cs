@@ -29,11 +29,22 @@
         private void InitializeComponent()
         {
             btnPlayerPlayer = new Button();
-            label1 = new Label();
+            lblTitolo = new Label();
             btnPlayerBot = new Button();
             btnBotBot = new Button();
             BtnApriTraining = new Button();
+            BtnTipoBot = new Button();
             SuspendLayout();
+            // 
+            // lblTitolo
+            // 
+            lblTitolo.AutoSize = true;
+            lblTitolo.Font = new Font("Cascadia Code SemiBold", 36F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblTitolo.Location = new Point(50, 50);
+            lblTitolo.Name = "lblTitolo";
+            lblTitolo.Size = new Size(279, 63);
+            lblTitolo.TabIndex = 1;
+            lblTitolo.Text = "Supertris";
             // 
             // btnPlayerPlayer
             // 
@@ -46,20 +57,10 @@
             btnPlayerPlayer.UseVisualStyleBackColor = true;
             btnPlayerPlayer.Click += btnPlayerPlayer_Click;
             // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Cascadia Code SemiBold", 36F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label1.Location = new Point(50, 50);
-            label1.Name = "label1";
-            label1.Size = new Size(279, 63);
-            label1.TabIndex = 1;
-            label1.Text = "Supertris";
-            // 
             // btnPlayerBot
             // 
             btnPlayerBot.Font = new Font("Cascadia Code SemiBold", 12F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point, 0);
-            btnPlayerBot.Location = new Point(50, 225);
+            btnPlayerBot.Location = new Point(50, 210);
             btnPlayerBot.Name = "btnPlayerBot";
             btnPlayerBot.Size = new Size(300, 50);
             btnPlayerBot.TabIndex = 2;
@@ -70,7 +71,7 @@
             // btnBotBot
             // 
             btnBotBot.Font = new Font("Cascadia Code SemiBold", 12F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point, 0);
-            btnBotBot.Location = new Point(50, 300);
+            btnBotBot.Location = new Point(50, 270);
             btnBotBot.Name = "btnBotBot";
             btnBotBot.Size = new Size(300, 50);
             btnBotBot.TabIndex = 3;
@@ -81,23 +82,35 @@
             // BtnApriTraining
             // 
             BtnApriTraining.Font = new Font("Cascadia Code SemiBold", 12F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point, 0);
-            BtnApriTraining.Location = new Point(50, 373);
+            BtnApriTraining.Location = new Point(50, 330);
             BtnApriTraining.Name = "BtnApriTraining";
             BtnApriTraining.Size = new Size(300, 50);
             BtnApriTraining.TabIndex = 4;
             BtnApriTraining.Text = "Allenamento";
             BtnApriTraining.UseVisualStyleBackColor = true;
             BtnApriTraining.Click += BtnApriTraining_Click;
+            //  
+            // BtnTipoBot
+            // 
+            BtnTipoBot.Font = new Font("Cascadia Code SemiBold", 12F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point, 0);
+            BtnTipoBot.Location = new Point(50, 390);
+            BtnTipoBot.Name = "BtnTipoBot";
+            BtnTipoBot.Size = new Size(300, 50);
+            BtnTipoBot.TabIndex = 5;
+            BtnTipoBot.Text = "Bot: Albero pesato";
+            BtnTipoBot.UseVisualStyleBackColor = true;
+            BtnTipoBot.Click += btnTipoBot_Click;
             // 
             // SelectionForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(400, 500);
+            Controls.Add(BtnTipoBot);
             Controls.Add(BtnApriTraining);
             Controls.Add(btnBotBot);
             Controls.Add(btnPlayerBot);
-            Controls.Add(label1);
+            Controls.Add(lblTitolo);
             Controls.Add(btnPlayerPlayer);
             Name = "SelectionForm";
             StartPosition = FormStartPosition.CenterParent;
@@ -109,9 +122,10 @@
         #endregion
 
         private Button btnPlayerPlayer;
-        private Label label1;
+        private Label lblTitolo;
         private Button btnPlayerBot;
         private Button btnBotBot;
         private Button BtnApriTraining;
+        private Button BtnTipoBot;
     }
 }

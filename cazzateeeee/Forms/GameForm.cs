@@ -1,5 +1,6 @@
 ﻿using cazzateeeee.Classes;
 using cazzateeeee.Helpers;
+using cazzateeeee.AI;
 
 namespace cazzateeeee
 {
@@ -10,32 +11,24 @@ namespace cazzateeeee
         private Button[,] buttons;  // Array per accesso rapido ai bottoni
         private Label lblTurno;
         private Label lblInfo;
-
-        // Colori del tema
-        private readonly Color coloreSfondo = Color.FromArgb(30, 30, 30);
-        private readonly Color coloreTrisNormale = Color.FromArgb(45, 45, 48);
-        private readonly Color coloreTrisAttivo = Color.FromArgb(60, 100, 60);
-        private readonly Color coloreTrisCompletato = Color.FromArgb(50, 50, 50);
-        private readonly Color coloreHover = Color.FromArgb(70, 70, 73);
-        private readonly Color coloreX = Color.FromArgb(220, 80, 80);      // Rosso
-        private readonly Color coloreO = Color.FromArgb(80, 150, 220);     // Blu
-        private readonly Color coloreTesto = Color.White;
-        private readonly Color coloreBordo = Color.FromArgb(80, 80, 80);
-
-        public GameForm(int mod, Form SelectionForm)
+        private int bot;            // se bot é utilizzato 1 = AlberoPesato 2 = Algoritmico
+        private AlberoPesato botAllenato;
+        private ColorManager colorManager = new ColorManager();
+            
+        public GameForm(int mod, Form SelectionForm, int modBot)
         {
             InitializeComponent();
 
-            // Impostazioni form
-            this.BackColor = coloreSfondo;
-            this.Size = new Size(500, 600);
-            this.StartPosition = FormStartPosition.CenterScreen;
+            BackColor = colorManager.coloreSfondo;
+            Size = new Size(550, 620);
+            StartPosition = FormStartPosition.CenterScreen;
 
             buttons = new Button[9, 9];  // 9 mini-tris, ognuno con 9 celle
 
             InitializeUI();
 
             gm = new GameManager();
+            bot = modBot;
 
             switch (mod)
             {
@@ -44,9 +37,27 @@ namespace cazzateeeee
                     break;
                 case 1:
                     gm.StartGamePVE();
+                    if (bot == 1)
+                    {
+                        botAllenato = new AlberoPesato();
+                        botAllenato.CaricaPesi("supertris_bot.weights");
+                    }
+                    else
+                    { 
+                        // qui ci va il bot algoritmico
+                    }
                     break;
                 case 2:
                     gm.StartGameEVE();
+                    if (bot == 1)
+                    {
+                        botAllenato = new AlberoPesato();
+                        botAllenato.CaricaPesi("supertris_bot.weights");
+                    }
+                    else
+                    {
+                        // qui ci va il bot algoritmico
+                    }
                     break;
             }
 
@@ -56,28 +67,16 @@ namespace cazzateeeee
 
         internal void InitializeUI()
         {
-            const int BUTTON_SIZE = 30;
+            const int BUTTON_SIZE = 50;
             const int BUTTON_MARGIN = 2;
             const int TRIS_SPACING = 10;
             const int START_X = 30;
             const int START_Y = 80;
 
-            // Label per il turno
-            lblTurno = new Label
-            {
-                Location = new Point(START_X, 20),
-                Size = new Size(300, 30),
-                Font = new Font("Segoe UI", 14, FontStyle.Bold),
-                ForeColor = coloreTesto,
-                BackColor = Color.Transparent,
-                Text = "Turno: X"
-            };
-            Controls.Add(lblTurno);
-
             // Label per info mossa
             lblInfo = new Label
             {
-                Location = new Point(START_X, 50),
+                Location = new Point(START_X + 100, 25),
                 Size = new Size(400, 20),
                 Font = new Font("Segoe UI", 10),
                 ForeColor = Color.FromArgb(150, 150, 150),
@@ -85,6 +84,18 @@ namespace cazzateeeee
                 Text = "Mossa libera - Gioca dove vuoi!"
             };
             Controls.Add(lblInfo);
+
+            // Label per il turno
+            lblTurno = new Label
+            {
+                Location = new Point(START_X, 20),
+                Size = new Size(300, 30),
+                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                ForeColor = colorManager.coloreTesto,
+                BackColor = Color.Transparent,
+                Text = "Turno: X"
+            };
+            Controls.Add(lblTurno);
 
             // Creazione griglia di bottoni
             for (int numTris = 0; numTris < 9; numTris++)
@@ -100,7 +111,7 @@ namespace cazzateeeee
                         START_Y + trisRow * (BUTTON_SIZE * 3 + BUTTON_MARGIN * 2 + TRIS_SPACING)
                     ),
                     Size = new Size(BUTTON_SIZE * 3 + BUTTON_MARGIN * 2, BUTTON_SIZE * 3 + BUTTON_MARGIN * 2),
-                    BackColor = coloreTrisNormale,
+                    BackColor = colorManager.coloreTrisNormale,
                     Tag = $"Panel{numTris}"
                 };
                 Controls.Add(trisPanel);
@@ -121,19 +132,19 @@ namespace cazzateeeee
                             Tag = $"Tris{numTris}Row{row}Col{col}",
                             FlatStyle = FlatStyle.Flat,
                             BackColor = Color.FromArgb(55, 55, 58),
-                            ForeColor = coloreTesto,
+                            ForeColor = colorManager.coloreTesto,
                             Font = new Font("Segoe UI", 14, FontStyle.Bold),
                             Cursor = Cursors.Hand
                         };
 
                         btn.FlatAppearance.BorderSize = 1;
-                        btn.FlatAppearance.BorderColor = coloreBordo;
+                        btn.FlatAppearance.BorderColor = colorManager.coloreBordo;
 
                         // Eventi hover
                         btn.MouseEnter += (s, e) =>
                         {
                             if (btn.Text == "")
-                                btn.BackColor = coloreHover;
+                                btn.BackColor = colorManager.coloreHover;
                         };
 
                         btn.MouseLeave += (s, e) =>
@@ -157,13 +168,13 @@ namespace cazzateeeee
         {
             // Aggiorna label turno
             lblTurno.Text = $"Turno: {gm.GetTurno()}";
-            lblTurno.ForeColor = gm.GetTurno() == 'X' ? coloreX : coloreO;
+            lblTurno.ForeColor = gm.GetTurno() == 'X' ? colorManager.coloreX : colorManager.coloreO;
 
             int prossimoTris = gm.GetProssimaTrisObbligatoria();
 
             if (prossimoTris == -1)
             {
-                lblInfo.Text = "Mossa libera - Gioca dove vuoi! 🎯";
+                lblInfo.Text = "Mossa libera!";
                 lblInfo.ForeColor = Color.FromArgb(100, 200, 100);
             }
             else
@@ -181,17 +192,17 @@ namespace cazzateeeee
                     if (prossimoTris == -1)
                     {
                         // Mossa libera - tutti i tris disponibili
-                        panel.BackColor = coloreTrisNormale;
+                        panel.BackColor = colorManager.coloreTrisNormale;
                     }
                     else if (i == prossimoTris)
                     {
                         // Questo è il tris dove si deve giocare
-                        panel.BackColor = coloreTrisAttivo;
+                        panel.BackColor = colorManager.coloreTrisAttivo;
                     }
                     else
                     {
                         // Tris non disponibile
-                        panel.BackColor = coloreTrisCompletato;
+                        panel.BackColor = colorManager.coloreTrisCompletato;
                     }
                 }
             }
@@ -227,7 +238,7 @@ namespace cazzateeeee
                 // Mossa valida - aggiorna la UI
                 char turnoAttuale = gm.GetTurno();
                 btn.Text = turnoAttuale.ToString();
-                btn.ForeColor = turnoAttuale == 'X' ? coloreX : coloreO;
+                btn.ForeColor = turnoAttuale == 'X' ? colorManager.coloreX : colorManager.coloreO;
                 btn.Enabled = false;
                 btn.BackColor = Color.FromArgb(40, 40, 43);
 
@@ -239,7 +250,7 @@ namespace cazzateeeee
                 if (vincitore != '-')
                 {
                     string nomeVincitore = vincitore == 'X' ? "X" : "O";
-                    Color coloreVincitore = vincitore == 'X' ? coloreX : coloreO;
+                    Color coloreVincitore = vincitore == 'X' ? colorManager.coloreX : colorManager.coloreO;
 
                     lblInfo.Text = $"🎉 {nomeVincitore} ha vinto! 🎉";
                     lblInfo.ForeColor = coloreVincitore;

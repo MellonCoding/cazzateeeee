@@ -1,4 +1,5 @@
-﻿using cazzateeeee.Forms;
+﻿using cazzateeeee.AI;
+using cazzateeeee.Forms;
 using cazzateeeee.Helpers;
 
 namespace cazzateeeee
@@ -8,6 +9,7 @@ namespace cazzateeeee
         private static int PLAYERvsPLAYERmod = 0;
         private static int PLAYERvsBOTmod = 1;
         private static int BOTvsBOTmod = 2;
+        private static int BOTmod = 1;  // se é 1 il bot utilizzato sará albero se 2 sará algoritmico
 
         public SelectionForm()
         {
@@ -16,21 +18,21 @@ namespace cazzateeeee
 
         private void btnPlayerPlayer_Click(object sender, EventArgs e)
         {
-            GameForm gf = new GameForm(PLAYERvsPLAYERmod, this);
+            GameForm gf = new GameForm(PLAYERvsPLAYERmod, this, 0);
             gf.Show();
             this.Hide();
         }
 
         private void btnPlayerBot_Click(object sender, EventArgs e)
         {
-            GameForm gf = new GameForm(PLAYERvsBOTmod, this);
+            GameForm gf = new GameForm(PLAYERvsBOTmod, this, BOTmod);
             gf.Show();
             this.Hide();
         }
 
         private void btnBotBot_Click(object sender, EventArgs e)
         {
-            GameForm gf = new GameForm(BOTvsBOTmod, this);
+            GameForm gf = new GameForm(BOTvsBOTmod, this, BOTmod);
             gf.Show();
             this.Hide();
         }
@@ -39,6 +41,20 @@ namespace cazzateeeee
         {
             TrainingForm trainingForm = new TrainingForm();
             trainingForm.ShowDialog();
+        }
+
+        private void btnTipoBot_Click(object sender, EventArgs e)
+        {
+            if ((sender as Button).Text == "Bot: Albero pesato")
+            {
+                (sender as Button).Text = "Bot: algoritmico";
+                BOTmod = 2;
+            }
+            else if ((sender as Button).Text == "Bot: algoritmico")
+            {
+                (sender as Button).Text = "Bot: Albero pesato";
+                BOTmod = 1;
+            }
         }
     }
 }
