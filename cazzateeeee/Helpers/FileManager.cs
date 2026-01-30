@@ -8,7 +8,7 @@ namespace cazzateeeee
 {
     public static class FileManager
     {
-        private static string percorso = Environment.CurrentDirectory + "\\mosse.txt";
+        private static string percorso = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mosse.txt");
 
         public static bool Start()
         { 

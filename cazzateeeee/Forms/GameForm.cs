@@ -17,7 +17,7 @@ namespace cazzateeeee
         private AlberoPesato? botAllenato;
         private bool botInPensiero; // Previene input durante il turno del bot
         private ColorManager colorManager = new ColorManager();
-        private string PathVersoPesi = System.AppDomain.CurrentDomain.BaseDirectory + "supertris_bot.weights";
+        private string PathVersoPesi = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "supertris_bot.weights");
         public GameForm(int mod, Form SelectionForm, int modBot)
         {
             InitializeComponent();
@@ -39,17 +39,16 @@ namespace cazzateeeee
             switch (mod)
             {
                 case 0: // PVP
-                    gm.StartGamePVP();
+                    gm.StartGame();
                     break;
                 case 1: // PVE - Player vs Bot
-                    gm.StartGamePVE();
+                    gm.StartGame();
                     if (tipoBot == 1)
                     {
                         botAllenato = new AlberoPesato(false);
                         if (File.Exists(PathVersoPesi))
                         {
                             botAllenato.CaricaPesi(PathVersoPesi);
-                            MessageBox.Show("Sex");
                         }
                     }
                     else
@@ -58,13 +57,13 @@ namespace cazzateeeee
                     }
                     break;
                 case 2: // EVE - Bot vs Bot
-                    gm.StartGameEVE();
+                    gm.StartGame();
                     if (tipoBot == 1)
                     {
                         botAllenato = new AlberoPesato(false);
-                        if (File.Exists("supertris_bot.weights"))
+                        if (File.Exists(PathVersoPesi))
                         {
-                            botAllenato.CaricaPesi("supertris_bot.weights");
+                            botAllenato.CaricaPesi(PathVersoPesi);
                         }
                     }
                     else
@@ -77,6 +76,7 @@ namespace cazzateeeee
             this.FormIniziale = SelectionForm;
             AggiornaVisualizzazione();
         }
+
 
         internal void InitializeUI()
         {
@@ -259,7 +259,7 @@ namespace cazzateeeee
                 btn.BackColor = Color.FromArgb(40, 40, 43);
 
                 // Scrivi su file
-                FileManager.Write($"{turnoAttuale} {numTris}{row}{col}");
+                FileManager.Write($"{turnoAttuale} {numTris} {(row * 3) + col}");
 
                 // Controlla vittoria
                 char vincitore = gm.CheckWin();
@@ -347,7 +347,7 @@ namespace cazzateeeee
                     }
 
                     // Scrivi su file
-                    FileManager.Write($"{gm.GetTurno()} {numTris}{row}{col}");
+                    FileManager.Write($"{gm.GetTurno()} {numTris} {(row * 3) + col}");
 
                     // Controlla vittoria
                     char vincitore = gm.CheckWin();

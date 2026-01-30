@@ -32,23 +32,9 @@ namespace cazzateeeee.Helpers
 
         // -------------------------------- END HELPERS ---------------------------- // 
 
-        public void StartGamePVP()
+        public void StartGame()
         {
             pve = false;
-            turnoCorrente = 'X';
-            ProssimoTrisObbligatorio = -1;
-        }
-
-        public void StartGamePVE()
-        {
-            pve = true;
-            turnoCorrente = 'X';
-            ProssimoTrisObbligatorio = -1;
-        }
-
-        public void StartGameEVE()
-        {
-            pve = true;
             turnoCorrente = 'X';
             ProssimoTrisObbligatorio = -1;
         }
