@@ -19,8 +19,8 @@ namespace cazzateeeee.AI
 
         public Trainer(AlberoPesato botDaAllenare, IBot avversario)
         {
-            this.botAllenato = botDaAllenare;
-            this.botAvversario = avversario;
+            botAllenato = botDaAllenare;
+            botAvversario = avversario;
             ResetStatistiche();
         }
 

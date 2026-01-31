@@ -10,6 +10,7 @@ namespace cazzateeeee
     {
         private static string percorso = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mosse.txt");
 
+
         public static bool Start()
         { 
             try

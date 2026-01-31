@@ -42,7 +42,7 @@ namespace cazzateeeee.Forms
             InitializeUI();
 
             bot = new AlberoPesato(false);
-            trainer = new Trainer(bot, new AlberoPesato(true));
+            trainer = new Trainer(bot, new HeuristicBot());
             allenamentoInCorso = false;
 
             AggiornaStatistiche(0, 0, 0, 0);

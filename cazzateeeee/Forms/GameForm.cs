@@ -14,7 +14,8 @@ namespace cazzateeeee
         private Label lblInfo;
         private int modalitaGioco;  // 0 = PVP, 1 = PVE, 2 = EVE
         private int tipoBot;        // 1 = AlberoPesato, 2 = Algoritmico
-        private AlberoPesato? botAllenato;
+        private AlberoPesato botAllenato;
+        private HeuristicBot botAlgoritmico;
         private bool botInPensiero; // Previene input durante il turno del bot
         private ColorManager colorManager = new ColorManager();
         private string PathVersoPesi = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "supertris_bot.weights");
@@ -43,33 +44,24 @@ namespace cazzateeeee
                     break;
                 case 1: // PVE - Player vs Bot
                     gm.StartGame();
-                    if (tipoBot == 1)
-                    {
-                        botAllenato = new AlberoPesato(false);
-                        if (File.Exists(PathVersoPesi))
-                        {
-                            botAllenato.CaricaPesi(PathVersoPesi);
-                        }
-                    }
-                    else
-                    {
-                        // TODO: bot algoritmico
-                    }
+                    botAlgoritmico = new HeuristicBot();
+
+                    //if (tipoBot == 1)
+                    //{
+                    //    botAllenato = new AlberoPesato(false);
+
+                    //    if (File.Exists(PathVersoPesi))
+                    //    {
+                    //        botAllenato.CaricaPesi(PathVersoPesi);
+                    //    }
+                    //}
+                    //else 
+                    //{
+                    //    botAlgoritmico = new HeuristicBot(); // Pronto all'uso!
+                    //}
                     break;
                 case 2: // EVE - Bot vs Bot
-                    gm.StartGame();
-                    if (tipoBot == 1)
-                    {
-                        botAllenato = new AlberoPesato(false);
-                        if (File.Exists(PathVersoPesi))
-                        {
-                            botAllenato.CaricaPesi(PathVersoPesi);
-                        }
-                    }
-                    else
-                    {
-                        // TODO: bot algoritmico
-                    }
+                    // TO-DO
                     break;
             }
 
@@ -318,12 +310,13 @@ namespace cazzateeeee
             botInPensiero = true;
 
             // Piccolo delay per rendere più naturale
-            await Task.Delay(500);
+            //await Task.Delay(500);
 
             string boardState = gm.GetBoardState();
             int trisObb = gm.GetProssimaTrisObbligatoria();
 
-            var mossa = botAllenato?.CalcolaMossa(boardState, trisObb, gm.GetTurno());
+            var mossa = botAlgoritmico?.CalcolaMossa(boardState, trisObb, gm.GetTurno());
+
 
             if (mossa.HasValue)
             {

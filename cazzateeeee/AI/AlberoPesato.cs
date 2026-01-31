@@ -19,6 +19,9 @@ namespace cazzateeeee.AI
         // Random per esplorare mosse nuove (epsilon-greedy opzionale)
         private Random random;
 
+        // Path per i pesi
+        private static string path = System.AppDomain.CurrentDomain.BaseDirectory + "supertris_bot.weights";
+
         // Parametri di apprendimento
         private float incrementoVittoria = 0.1f;
         private float decrementoSconfitta = 0.1f;
@@ -29,11 +32,13 @@ namespace cazzateeeee.AI
             tabellaStati = new Dictionary<string, Dictionary<string, float>>();
             percorsoPartita = new List<(string, string)>();
             random = new Random();
+
+            // se il bot é un bot da allenamento, denominato da a_pesi, allora carico i pesi, 
             if (a_pesi)
             {
-                if (File.Exists(System.AppDomain.CurrentDomain.BaseDirectory + "supertris_bot.weights"))
+                if (File.Exists(path))
                 {
-                    this.CaricaPesi(System.AppDomain.CurrentDomain.BaseDirectory + "supertris_bot.weights");
+                    this.CaricaPesi(path);
                 }
             }
         }
