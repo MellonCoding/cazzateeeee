@@ -42,7 +42,7 @@ namespace cazzateeeee.Forms
             InitializeUI();
 
             bot = new AlberoPesato(false);
-            trainer = new Trainer(bot, new HeuristicBot());
+            trainer = new Trainer(bot, new AlberoPesato(true));
             allenamentoInCorso = false;
 
             AggiornaStatistiche(0, 0, 0, 0);
@@ -383,7 +383,7 @@ namespace cazzateeeee.Forms
             if (result == DialogResult.Yes)
             {
                 bot = new AlberoPesato(false);
-                trainer = new Trainer(bot, new RandomBot());
+                trainer = new Trainer(bot, new AlberoPesato(true));
                 AggiornaStatistiche(0, 0, 0, 0);
                 progressBar.Value = 0;
                 AggiungiLog("🔄 Bot resettato completamente");

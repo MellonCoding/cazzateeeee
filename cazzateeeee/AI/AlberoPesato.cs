@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace cazzateeeee.AI
 {
@@ -45,26 +45,98 @@ namespace cazzateeeee.AI
 
         public (int numTris, int row, int col)? CalcolaMossa(string boardState, int trisObbligatoria, char turno)
         {
-            // Crea la chiave dello stato corrente
-            string chiaveStato = CreaChiaveStato(boardState, trisObbligatoria);
+            if (trisObbligatoria == -1)
+            {
+                // MOSSA LIBERA - Ottimizzazione:
+                // Valuta la migliore mossa di ogni tris e scegli la migliore globale
+                (int numTris, int row, int col) mossaMiglioreGlobale = (-1, -1, -1);
+                float pesoMiglioreGlobale = float.MinValue;
 
-            // Trova tutte le mosse valide
-            List<(int numTris, int row, int col)> mosseValide = TrovaMosseValide(boardState, trisObbligatoria);
+                for (int numTris = 0; numTris < 9; numTris++)
+                {
+                    // Crea chiave stato per questo tris
+                    string chiaveStato = CreaChiaveStato(boardState, numTris);
 
-            if (mosseValide.Count == 0)
+                    // Assicurati che lo stato esista
+                    if (!tabellaStati.ContainsKey(chiaveStato))
+                    {
+                        tabellaStati[chiaveStato] = new Dictionary<string, float>();
+                    }
+
+                    // Trova la migliore mossa in questo tris
+                    var mossaMiglioreTris = TrovaMiglioreMossaInTris(boardState, numTris, chiaveStato);
+
+                    if (mossaMiglioreTris.HasValue)
+                    {
+                        float peso = mossaMiglioreTris.Value.peso;
+
+                        if (peso > pesoMiglioreGlobale)
+                        {
+                            pesoMiglioreGlobale = peso;
+                            mossaMiglioreGlobale = (numTris, mossaMiglioreTris.Value.row, mossaMiglioreTris.Value.col);
+                        }
+                    }
+                }
+
+                if (mossaMiglioreGlobale.numTris == -1)
+                    return null;
+
+                // Salva nel percorso con lo stato corretto
+                string chiaveStatoFinale = CreaChiaveStato(boardState, mossaMiglioreGlobale.numTris);
+                string chiaveMossaFinale = CreaChiaveMossa(
+                    mossaMiglioreGlobale.numTris, 
+                    mossaMiglioreGlobale.row, 
+                    mossaMiglioreGlobale.col);
+                percorsoPartita.Add((chiaveStatoFinale, chiaveMossaFinale));
+
+                return mossaMiglioreGlobale;
+            }
+            else
+            {
+                // MOSSA OBBLIGATORIA - Valuta solo il tris specificato
+                string chiaveStato = CreaChiaveStato(boardState, trisObbligatoria);
+
+                // Assicurati che lo stato esista
+                if (!tabellaStati.ContainsKey(chiaveStato))
+                {
+                    tabellaStati[chiaveStato] = new Dictionary<string, float>();
+                }
+
+                var mossaMigliore = TrovaMiglioreMossaInTris(boardState, trisObbligatoria, chiaveStato);
+
+                if (mossaMigliore.HasValue)
+                {
+                    string chiaveMossa = CreaChiaveMossa(
+                        trisObbligatoria, 
+                        mossaMigliore.Value.row, 
+                        mossaMigliore.Value.col);
+                    
+                    // Salva nel percorso
+                    percorsoPartita.Add((chiaveStato, chiaveMossa));
+
+                    return (trisObbligatoria, mossaMigliore.Value.row, mossaMigliore.Value.col);
+                }
+
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Trova la migliore mossa (peso più alto) in un singolo tris
+        /// </summary>
+        private (int row, int col, float peso)? TrovaMiglioreMossaInTris(
+            string boardState, int numTris, string chiaveStato)
+        {
+            List<(int numTris, int row, int col)> mosse = new List<(int numTris, int row, int col)>();
+            AggiungiMosseTris(mosse, boardState, numTris);
+
+            if (mosse.Count == 0)
                 return null;
 
-            // Assicurati che lo stato esista nella tabella
-            if (!tabellaStati.ContainsKey(chiaveStato))
-            {
-                tabellaStati[chiaveStato] = new Dictionary<string, float>();
-            }
-
-            // Trova la mossa con il peso più alto
-            string mossaMigliore = null;
+            (int row, int col) mossaMigliore = (mosse[0].row, mosse[0].col);
             float pesoMigliore = float.MinValue;
 
-            foreach (var mossa in mosseValide)
+            foreach (var mossa in mosse)
             {
                 string chiaveMossa = CreaChiaveMossa(mossa.numTris, mossa.row, mossa.col);
 
@@ -79,15 +151,11 @@ namespace cazzateeeee.AI
                 if (peso > pesoMigliore)
                 {
                     pesoMigliore = peso;
-                    mossaMigliore = chiaveMossa;
+                    mossaMigliore = (mossa.row, mossa.col);
                 }
             }
 
-            // Salva lo stato e la mossa nel percorso
-            percorsoPartita.Add((chiaveStato, mossaMigliore));
-
-            // Decodifica la mossa dalla chiave
-            return DecodificaMossa(mossaMigliore);
+            return (mossaMigliore.row, mossaMigliore.col, pesoMigliore);
         }
 
         public void NotificaRisultatoPartita(bool? haVinto)

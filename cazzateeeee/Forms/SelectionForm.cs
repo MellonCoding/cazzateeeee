@@ -32,9 +32,16 @@ namespace cazzateeeee
 
         private void btnBotBot_Click(object sender, EventArgs e)
         {
-            GameForm gf = new GameForm(BOTvsBOTmod, this, BOTmod);
-            gf.Show();
-            this.Hide();
+            // Apri dialog per scegliere se essere Player 1 o Player 2
+            EvESetupDialog dialog = new EvESetupDialog();
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                bool sonoPlayer1 = dialog.SonoGiocatore1;
+                GameForm gf = new GameForm(BOTvsBOTmod, this, BOTmod, sonoPlayer1);
+                gf.Show();
+                this.Hide();
+            }
         }
 
         private void BtnApriTraining_Click(object sender, EventArgs e)
