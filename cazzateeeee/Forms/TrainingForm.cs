@@ -172,7 +172,7 @@ namespace cazzateeeee.Forms
 
             Label lblControlli = new Label
             {
-                Text = "💡 Il bot impara giocando contro un albero pesato",
+                Text = "💡 Il bot impara giocando contro un bot che utilizza l'algoritmo Minimaxx",
                 Location = new Point(10, 45),
                 Size = new Size(640, 20),
                 Font = new Font("Segoe UI", 9, FontStyle.Italic),

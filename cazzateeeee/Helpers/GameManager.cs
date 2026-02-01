@@ -5,17 +5,15 @@ namespace cazzateeeee.Helpers
     internal class GameManager
     {
         private Supertris board;
-        private int ProssimoTrisObbligatorio;  // -1 = mossa libera, altrimenti indica il tris dove giocare
+        private int ProssimoTrisObbligatorio;  
         private char turnoCorrente;
-        private bool pve;
         private bool mossaValida;
 
         public GameManager()
         {
             board = new Supertris();
-            FileManager.Start();
             turnoCorrente = 'X';
-            ProssimoTrisObbligatorio = -1;  // Prima mossa libera
+            ProssimoTrisObbligatorio = -1;
             mossaValida = false;
         }
 
@@ -23,21 +21,11 @@ namespace cazzateeeee.Helpers
 
         public char GetTurno() => turnoCorrente;
 
-        public void CambiaTurno()
-        {
-            turnoCorrente = turnoCorrente == 'X' ? 'O' : 'X';
-        }
+        public void CambiaTurno() { turnoCorrente = turnoCorrente == 'X' ? 'O' : 'X'; }
 
         public int GetProssimaTrisObbligatoria() => ProssimoTrisObbligatorio;
 
         // -------------------------------- END HELPERS ---------------------------- // 
-
-        public void StartGame()
-        {
-            pve = false;
-            turnoCorrente = 'X';
-            ProssimoTrisObbligatorio = -1;
-        }
 
         public bool MakeMove(int numTris, int row, int col)
         {

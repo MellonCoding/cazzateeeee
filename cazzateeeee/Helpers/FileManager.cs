@@ -6,12 +6,16 @@
 
 namespace cazzateeeee
 {
-    public static class FileManager
+    public class FileManager
     {
-        private static string percorso = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mosse.txt");
+        private static string percorso;
 
+        public FileManager(string a_percorso)
+        {
+            percorso = a_percorso;
+        }
 
-        public static bool Start()
+        public bool Start()
         { 
             try
             {
@@ -26,8 +30,7 @@ namespace cazzateeeee
             }
         }
 
-        // SalvaFile.Scrivi($"{giocatoreCorrente} ({NumTris}{NumRiga},{NumColonna})");
-        public static void Write(string testo)
+        public void Write(string testo)
         {
             // MessageBox.Show(percorso);
             using (StreamWriter sw = new StreamWriter(percorso, true))
