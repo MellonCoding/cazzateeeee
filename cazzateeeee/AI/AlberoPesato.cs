@@ -11,7 +11,7 @@ namespace cazzateeeee.AI
         // Tabella che mappa stato -> pesi delle mosse
         // Chiave: stato della board (es. "---X-----O---...") + trisObbligatoria
         // Valore: dizionario di mosse con i loro pesi
-        private Dictionary<string, Dictionary<string, float>> tabellaStati;
+        private Dictionary<string, Dictionary<string, int>> tabellaStati;
 
         // Percorso seguito durante la partita corrente
         private List<(string stato, string mossa)> percorsoPartita;
@@ -23,13 +23,13 @@ namespace cazzateeeee.AI
         private static string path = System.AppDomain.CurrentDomain.BaseDirectory + "supertris_bot.weights";
 
         // Parametri di apprendimento
-        private float incrementoVittoria = 0.1f;
-        private float decrementoSconfitta = 0.1f;
-        private float pesoIniziale = 0.5f; // Peso neutro per mosse mai viste
+        private int incrementoVittoria = 2;
+        private int decrementoSconfitta = 2;
+        private int pesoIniziale = 5; // Peso neutro per mosse mai viste
 
         public AlberoPesato(bool a_pesi)
         {
-            tabellaStati = new Dictionary<string, Dictionary<string, float>>();
+            tabellaStati = new Dictionary<string, Dictionary<string, int>>();
             percorsoPartita = new List<(string, string)>();
             random = new Random();
 
@@ -60,7 +60,7 @@ namespace cazzateeeee.AI
                     // Assicurati che lo stato esista
                     if (!tabellaStati.ContainsKey(chiaveStato))
                     {
-                        tabellaStati[chiaveStato] = new Dictionary<string, float>();
+                        tabellaStati[chiaveStato] = new Dictionary<string, int>();
                     }
 
                     // Trova la migliore mossa in questo tris
@@ -99,7 +99,7 @@ namespace cazzateeeee.AI
                 // Assicurati che lo stato esista
                 if (!tabellaStati.ContainsKey(chiaveStato))
                 {
-                    tabellaStati[chiaveStato] = new Dictionary<string, float>();
+                    tabellaStati[chiaveStato] = new Dictionary<string, int>();
                 }
 
                 var mossaMigliore = TrovaMiglioreMossaInTris(boardState, trisObbligatoria, chiaveStato);
@@ -167,7 +167,7 @@ namespace cazzateeeee.AI
                 return;
             }
 
-            float delta = haVinto.Value ? incrementoVittoria : -decrementoSconfitta;
+            int delta = haVinto.Value ? incrementoVittoria : -decrementoSconfitta;
 
             // Aggiorna i pesi di tutte le mosse nel percorso
             foreach (var (stato, mossa) in percorsoPartita)
@@ -177,7 +177,7 @@ namespace cazzateeeee.AI
                     tabellaStati[stato][mossa] += delta;
 
                     // Mantieni i pesi in un range ragionevole (0.0 - 1.0)
-                    tabellaStati[stato][mossa] = Math.Max(0.0f, Math.Min(1.0f, tabellaStati[stato][mossa]));
+                    tabellaStati[stato][mossa] = Math.Max(0, Math.Min(1, tabellaStati[stato][mossa]));
                 }
             }
 
@@ -243,11 +243,11 @@ namespace cazzateeeee.AI
 
                         string stato = parti[0];
                         string mossa = parti[1];
-                        float peso = float.Parse(parti[2]);
+                        int peso = int.Parse(parti[2]);
 
                         if (!tabellaStati.ContainsKey(stato))
                         {
-                            tabellaStati[stato] = new Dictionary<string, float>();
+                            tabellaStati[stato] = new Dictionary<string, int>();
                         }
 
                         tabellaStati[stato][mossa] = peso;

@@ -3,7 +3,7 @@ namespace cazzateeeee.AI
     internal class MinimaxBot : IBot
     {
         // -------- CONFIGURAZIONE --------
-        private int maxDepth = 3;  // Profondità massima di esplorazione minimax
+        private int maxDepth = 5;  // Profondità massima di esplorazione minimax
         private Random random;
         private int mosseGiocate;
         private const int MOSSE_RANDOM = 2;  // Prime 2 mosse random

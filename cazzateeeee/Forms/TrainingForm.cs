@@ -41,8 +41,8 @@ namespace cazzateeeee.Forms
             InitializeComponent();
             InitializeUI();
 
-            bot = new AlberoPesato(false);
-            trainer = new Trainer(bot, new AlberoPesato(true));
+            bot = new AlberoPesato(true);
+            trainer = new Trainer(bot, new MinimaxBot());
             allenamentoInCorso = false;
 
             AggiornaStatistiche(0, 0, 0, 0);
