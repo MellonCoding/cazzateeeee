@@ -8,9 +8,15 @@ namespace cazzateeeee.Helpers
 {
     internal class ColorManager
     {
-        // La classe é qui per motivi didattici
-
-        // non so perché ma quando usavo questa classe come recipiente per tenere i colori e da un altra
-        // classe provavo a prenderli non mi prendeva i colori giusti
+        // Colori del tema
+        public readonly Color coloreSfondo = Color.FromArgb(30, 30, 30);
+        public readonly Color coloreTrisNormale = Color.FromArgb(45, 45, 48);
+        public readonly Color coloreTrisAttivo = Color.FromArgb(60, 100, 60);
+        public readonly Color coloreTrisCompletato = Color.FromArgb(50, 50, 50);
+        public readonly Color coloreHover = Color.FromArgb(70, 70, 73);
+        public readonly Color coloreX = Color.FromArgb(220, 80, 80);      // Rosso
+        public readonly Color coloreO = Color.FromArgb(80, 150, 220);     // Blu
+        public readonly Color coloreTesto = Color.White;
+        public readonly Color coloreBordo = Color.FromArgb(80, 80, 80);
     }
 }

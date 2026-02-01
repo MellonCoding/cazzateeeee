@@ -16,18 +16,8 @@ namespace cazzateeeee
         private AlberoPesato botAllenato;
         private MinimaxBot botAlgoritmico;
         private bool botInPensiero;
+        private ColorManager colorManager = new ColorManager();
         private string percorsoFile;
-
-        // colori -> qui per probelmi di compatibilitá
-        public readonly Color coloreSfondo = Color.FromArgb(30, 30, 30);
-        public readonly Color coloreTrisNormale = Color.FromArgb(45, 45, 48);
-        public readonly Color coloreTrisAttivo = Color.FromArgb(60, 100, 60);
-        public readonly Color coloreTrisCompletato = Color.FromArgb(50, 50, 50);
-        public readonly Color coloreHover = Color.FromArgb(70, 70, 73);
-        public readonly Color coloreX = Color.FromArgb(220, 80, 80);      // Rosso
-        public readonly Color coloreO = Color.FromArgb(80, 150, 220);     // Blu
-        public readonly Color coloreTesto = Color.White;
-        public readonly Color coloreBordo = Color.FromArgb(80, 80, 80);
 
         // EvE Mode
         private FileWatcher fileWatcher;
@@ -38,7 +28,7 @@ namespace cazzateeeee
         {
             InitializeComponent();
 
-            BackColor = coloreSfondo;
+            BackColor = colorManager.coloreSfondo;
             Size = new Size(550, 620);
             StartPosition = FormStartPosition.CenterScreen;
 
@@ -94,7 +84,7 @@ namespace cazzateeeee
 
                     if (openDialog.ShowDialog() == DialogResult.OK)
                     {
-                        percorsoFile = openDialog.FileName;
+                        percorsoFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mosse.txt");
                         fileWatcher = new FileWatcher(percorsoFile, OnMossaAvversarioRicevuta);
                         fileWatcher.Avvia();
                     }
@@ -143,7 +133,7 @@ namespace cazzateeeee
                 Location = new Point(START_X, 20),
                 Size = new Size(300, 30),
                 Font = new Font("Segoe UI", 14, FontStyle.Bold),
-                ForeColor = coloreTesto,
+                ForeColor = colorManager.coloreTesto,
                 BackColor = Color.Transparent,
                 Text = "Turno: X"
             };
@@ -162,7 +152,7 @@ namespace cazzateeeee
                         START_Y + trisRow * (BUTTON_SIZE * 3 + BUTTON_MARGIN * 2 + TRIS_SPACING)
                     ),
                     Size = new Size(BUTTON_SIZE * 3 + BUTTON_MARGIN * 2, BUTTON_SIZE * 3 + BUTTON_MARGIN * 2),
-                    BackColor = coloreTrisNormale,
+                    BackColor = colorManager.coloreTrisNormale,
                     Tag = $"Panel{numTris}"
                 };
                 Controls.Add(trisPanel);
@@ -183,24 +173,26 @@ namespace cazzateeeee
                             Tag = $"Tris{numTris}Row{row}Col{col}",
                             FlatStyle = FlatStyle.Flat,
                             BackColor = Color.FromArgb(55, 55, 58),
-                            ForeColor = coloreTesto,
-                            Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                            ForeColor = colorManager.coloreTesto,
+                            Font = new Font("Segoe UI", 16, FontStyle.Bold),
                             Cursor = Cursors.Hand
                         };
 
                         btn.FlatAppearance.BorderSize = 1;
-                        btn.FlatAppearance.BorderColor = coloreBordo;
+                        btn.FlatAppearance.BorderColor = colorManager.coloreBordo;
 
                         btn.MouseEnter += (s, e) =>
                         {
                             if (btn.Text == "")
-                                btn.BackColor = coloreHover;
+                                btn.BackColor = colorManager.coloreHover;
                         };
 
                         btn.MouseLeave += (s, e) =>
                         {
                             if (btn.Text == "")
                                 btn.BackColor = Color.FromArgb(55, 55, 58);
+                            else
+                                btn.BackColor = Color.FromArgb(40, 40, 43);
                         };
 
                         btn.Click += Mossa;
@@ -216,7 +208,7 @@ namespace cazzateeeee
         private void AggiornaVisualizzazione()
         {
             lblTurno.Text = $"Turno: {gm.GetTurno()}";
-            lblTurno.ForeColor = gm.GetTurno() == 'X' ? coloreX : coloreO;
+            lblTurno.ForeColor = gm.GetTurno() == 'X' ? colorManager.coloreX : colorManager.coloreO;
 
             int prossimoTris = gm.GetProssimaTrisObbligatoria();
 
@@ -240,15 +232,15 @@ namespace cazzateeeee
                 {
                     if (prossimoTris == -1)
                     {
-                        panels[i].BackColor = coloreTrisNormale;
+                        panels[i].BackColor = colorManager.coloreTrisNormale;
                     }
                     else if (i == prossimoTris)
                     {
-                        panels[i].BackColor = coloreTrisAttivo;
+                        panels[i].BackColor = colorManager.coloreTrisAttivo;
                     }
                     else
                     {
-                        panels[i].BackColor = coloreTrisCompletato;
+                        panels[i].BackColor = colorManager.coloreTrisCompletato;
                     }
                 }
             }
@@ -289,6 +281,14 @@ namespace cazzateeeee
                 return;
             }
 
+            // 🔥 FIX PRINCIPALE: Ignora click su celle già giocate
+            if (btn.Text != "")
+            {
+                lblInfo.Text = "❌ Cella già occupata!";
+                lblInfo.ForeColor = Color.FromArgb(255, 100, 100);
+                return;
+            }
+
             string tag = btn.Tag?.ToString() ?? "";
             List<int> numeriTag = new List<int>();
 
@@ -309,11 +309,12 @@ namespace cazzateeeee
             if (gm.MakeMove(numTris, row, col))
             {
                 char turnoAttuale = gm.GetTurno();
+                
+                // 🔥 SOLUZIONE: Imposta PRIMA il testo, POI il colore
                 btn.Text = turnoAttuale.ToString();
-                // FIX: Colori corretti per X e O
-                btn.ForeColor = turnoAttuale == 'X' ? coloreX : coloreO;
-                btn.Enabled = false;
                 btn.BackColor = Color.FromArgb(40, 40, 43);
+                btn.ForeColor = turnoAttuale == 'X' ? colorManager.coloreX : colorManager.coloreO;
+                // NON disabilitiamo il bottone! Controlliamo btn.Text invece
 
                 FileManager.Write($"{turnoAttuale} {numTris} {(row * 3) + col}");
 
@@ -398,11 +399,10 @@ namespace cazzateeeee
                     {
                         Button btn = buttons[numTris, buttonIndex];
 
+                        // 🔥 SOLUZIONE: Stesso ordine
                         btn.Text = turnoBot.ToString();
-                        // FIX: Colori corretti per X e O
-                        btn.ForeColor = turnoBot == 'X' ? coloreX : coloreO;
-                        btn.Enabled = false;
                         btn.BackColor = Color.FromArgb(40, 40, 43);
+                        btn.ForeColor = turnoBot == 'X' ? colorManager.coloreX : colorManager.coloreO;
                     }
 
                     FileManager.Write($"{turnoBot} {numTris} {(row * 3) + col}");
@@ -441,7 +441,7 @@ namespace cazzateeeee
                 {
                     foreach (Control ctrl in panels[i].Controls)
                     {
-                        if (ctrl is Button btn && btn.Enabled)
+                        if (ctrl is Button btn && btn.Text == "") // Solo bottoni vuoti
                         {
                             btn.Cursor = cursore;
                         }
@@ -471,15 +471,15 @@ namespace cazzateeeee
                         // Ripristina i colori normali in base allo stato
                         if (prossimoTris == -1)
                         {
-                            panels[i].BackColor = coloreTrisNormale;
+                            panels[i].BackColor = colorManager.coloreTrisNormale;
                         }
                         else if (i == prossimoTris)
                         {
-                            panels[i].BackColor = coloreTrisAttivo;
+                            panels[i].BackColor = colorManager.coloreTrisAttivo;
                         }
                         else
                         {
-                            panels[i].BackColor = coloreTrisCompletato;
+                            panels[i].BackColor = colorManager.coloreTrisCompletato;
                         }
                     }
                 }
@@ -516,11 +516,11 @@ namespace cazzateeeee
                     if (buttons[numTris, buttonIndex] != null)
                     {
                         Button btn = buttons[numTris, buttonIndex];
+                        
+                        // 🔥 SOLUZIONE: Stesso ordine
                         btn.Text = turno.ToString();
-                        // FIX: Colori corretti per X e O
-                        btn.ForeColor = turno == 'X' ? coloreX : coloreO;
-                        btn.Enabled = false;
                         btn.BackColor = Color.FromArgb(40, 40, 43);
+                        btn.ForeColor = turno == 'X' ? colorManager.coloreX : colorManager.coloreO;
                     }
 
                     // Scrivi la mossa su file
@@ -594,11 +594,11 @@ namespace cazzateeeee
                     if (buttons[numTris, buttonIndex] != null)
                     {
                         Button btn = buttons[numTris, buttonIndex];
+                        
+                        // 🔥 SOLUZIONE: Stesso ordine
                         btn.Text = turnoAvversario.ToString();
-                        // FIX: Colori corretti per X e O
-                        btn.ForeColor = turnoAvversario == 'X' ? coloreX : coloreO;
-                        btn.Enabled = false;
                         btn.BackColor = Color.FromArgb(40, 40, 43);
+                        btn.ForeColor = turnoAvversario == 'X' ? colorManager.coloreX : colorManager.coloreO;
                     }
 
                     // Controlla vittoria
@@ -630,7 +630,7 @@ namespace cazzateeeee
         private void GestioneVittoria(char vincitore)
         {
             string nomeVincitore = vincitore.ToString();
-            Color coloreVincitore = vincitore == 'X' ? coloreX : coloreO;
+            Color coloreVincitore = vincitore == 'X' ? colorManager.coloreX : colorManager.coloreO;
 
             lblInfo.Text = $"🎉 {nomeVincitore} ha vinto! 🎉";
             lblInfo.ForeColor = coloreVincitore;
@@ -643,6 +643,7 @@ namespace cazzateeeee
                 MessageBoxIcon.Information
             );
 
+            // 🔥 FIX: Cambia solo il cursore, non disabilitare
             for (int i = 0; i < 9; i++)
             {
                 if (panels[i] != null)
@@ -650,7 +651,7 @@ namespace cazzateeeee
                     foreach (Control btnCtrl in panels[i].Controls)
                     {
                         if (btnCtrl is Button b)
-                            b.Enabled = false;
+                            b.Cursor = Cursors.No;
                     }
                 }
             }
@@ -670,7 +671,7 @@ namespace cazzateeeee
                 fileWatcher.Ferma();
             }
 
-            FormIniziale.Close();
+            FormIniziale.Show();
         }
     }
 }
