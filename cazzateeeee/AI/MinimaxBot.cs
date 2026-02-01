@@ -13,7 +13,6 @@ namespace cazzateeeee.AI
         private const int PesoLinea = 5;
         private const int PesoCentro = 5;
         private const int PesoAngolo = 2;
-        private const int PesoGlobale = 500;
         private const int PesoCentroGlobale = 50;
         private const int PesoAngoloGlobale = 20;
 

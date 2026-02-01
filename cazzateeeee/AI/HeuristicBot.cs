@@ -401,25 +401,6 @@ namespace cazzateeeee.AI
             return true;
         }
 
-        private List<(int numTris, int row, int col)> TrovaMosseValide(string boardState, int trisObbligatoria)
-        {
-            List<(int numTris, int row, int col)> mosse = new List<(int numTris, int row, int col)>();
-
-            if (trisObbligatoria == -1)
-            {
-                for (int numTris = 0; numTris < 9; numTris++)
-                {
-                    AggiungiMosseTris(mosse, boardState, numTris);
-                }
-            }
-            else
-            {
-                AggiungiMosseTris(mosse, boardState, trisObbligatoria);
-            }
-
-            return mosse;
-        }
-
         private void AggiungiMosseTris(List<(int numTris, int row, int col)> mosse, string boardState, int numTris)
         {
             int offset = numTris * 9;
