@@ -8,7 +8,17 @@ namespace cazzateeeee.Forms
     public partial class EvESetupDialog : Form
     {
         public bool SonoGiocatore1 { get; private set; }
-        private ColorManager colorManager = new ColorManager();
+
+        // Colori del tema
+        public readonly Color coloreSfondo = Color.FromArgb(30, 30, 30);
+        public readonly Color coloreTrisNormale = Color.FromArgb(45, 45, 48);
+        public readonly Color coloreTrisAttivo = Color.FromArgb(60, 100, 60);
+        public readonly Color coloreTrisCompletato = Color.FromArgb(50, 50, 50);
+        public readonly Color coloreHover = Color.FromArgb(70, 70, 73);
+        public readonly Color coloreX = Color.FromArgb(220, 80, 80);      // Rosso
+        public readonly Color coloreO = Color.FromArgb(80, 150, 220);     // Blu
+        public readonly Color coloreTesto = Color.White;
+        public readonly Color coloreBordo = Color.FromArgb(80, 80, 80);
 
         public EvESetupDialog()
         {
@@ -20,7 +30,7 @@ namespace cazzateeeee.Forms
         {
             this.Text = "Setup Modalità Bot vs Bot";
             this.Size = new Size(500, 300);
-            this.BackColor = colorManager.coloreSfondo;
+            this.BackColor = coloreSfondo;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -33,7 +43,7 @@ namespace cazzateeeee.Forms
                 Location = new Point(20, 20),
                 Size = new Size(460, 40),
                 Font = new Font("Segoe UI", 16, FontStyle.Bold),
-                ForeColor = colorManager.coloreTesto,
+                ForeColor = coloreTesto,
                 BackColor = Color.Transparent,
                 TextAlign = ContentAlignment.MiddleCenter
             };
@@ -61,7 +71,7 @@ namespace cazzateeeee.Forms
                 Text = "🎯 Giocatore 1 (X)\nFaccio la prima mossa",
                 Location = new Point(50, 180),
                 Size = new Size(180, 60),
-                BackColor = colorManager.coloreX,
+                BackColor = coloreX,
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 FlatStyle = FlatStyle.Flat,
@@ -82,7 +92,7 @@ namespace cazzateeeee.Forms
                 Text = "⏳ Giocatore 2 (O)\nAspetto la prima mossa",
                 Location = new Point(270, 180),
                 Size = new Size(180, 60),
-                BackColor = colorManager.coloreO,
+                BackColor = coloreO,
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 FlatStyle = FlatStyle.Flat,

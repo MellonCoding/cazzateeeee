@@ -47,7 +47,7 @@ namespace cazzateeeee.Helpers
         private void OnFileChanged(object sender, FileSystemEventArgs e)
         {
             // Delay breve per assicurarsi che il file sia completamente scritto
-            Thread.Sleep(100);
+            Thread.Sleep(500);
 
             string nuovaUltimaRiga = LeggiUltimaRiga();
 

@@ -1,18 +1,21 @@
-﻿namespace cazzateeeee.AI
+namespace cazzateeeee.AI
 {
     internal class MinimaxBot : IBot
     {
         // -------- CONFIGURAZIONE --------
         private int maxDepth = 3;  // Profondità massima di esplorazione minimax
+        private Random random;
+        private int mosseGiocate;
+        private const int MOSSE_RANDOM = 2;  // Prime 2 mosse random
 
         // -------- PESI EURISTICI --------
         private const int PesoTrisVinto = 1000;
         private const int PesoLinea = 5;
         private const int PesoCentro = 5;
         private const int PesoAngolo = 2;
-        private const int PesoGlobale = 500;           // ← Aumenta a 1000
+        private const int PesoGlobale = 500;
         private const int PesoCentroGlobale = 50;
-        private const int PesoAngoloGlobale = 20;      // Bonus vincita mini-tris angolo (0,2,6,8)
+        private const int PesoAngoloGlobale = 20;
 
         // -------- STRUTTURE DATI --------
         private struct Mossa
@@ -27,20 +30,32 @@
         public MinimaxBot()
         {
             gameState = new int[9, 9];
+            random = new Random();
+            mosseGiocate = 0;
         }
 
         // -------- IMPLEMENTAZIONE INTERFACCIA IBot --------
 
         public (int numTris, int row, int col)? CalcolaMossa(string boardState, int trisObbligatoria, char turno)
         {
+            ParseBoardState(boardState, turno);
+
+            // Prime MOSSE_RANDOM mosse: gioca casualmente per variabilità
+            if (mosseGiocate < MOSSE_RANDOM)
+            {
+                mosseGiocate++;
+                return CalcolaMossaRandom(boardState, trisObbligatoria);
+            }
+
+            mosseGiocate++;
+
             Mossa miglioreMossa = new Mossa();
             Mossa mossaIniziale = new Mossa();
             int trisRow, trisCol, numTris, row, col;
 
-            ParseBoardState(boardState, turno);
-
             if (trisObbligatoria != -1)
             {
+                // Mossa obbligatoria in un tris specifico
                 trisRow = trisObbligatoria / 3;
                 trisCol = trisObbligatoria % 3;
                 mossaIniziale.coordinataX = trisCol * 3;
@@ -48,12 +63,15 @@
             }
             else
             {
+                // Mossa libera - usa (0,0) come placeholder
+                // Il minimax esplorerà tutte le opzioni valide
                 mossaIniziale.coordinataX = 0;
                 mossaIniziale.coordinataY = 0;
             }
 
-            Minimax(maxDepth, gameState, true, mossaIniziale, int.MinValue, int.MaxValue, ref miglioreMossa, true);
+            Minimax(maxDepth, gameState, true, mossaIniziale, int.MinValue, int.MaxValue, ref miglioreMossa, true, trisObbligatoria);
 
+            // Converti coordinate globali in coordinate locali
             numTris = (miglioreMossa.coordinataY / 3) * 3 + (miglioreMossa.coordinataX / 3);
             row = miglioreMossa.coordinataY % 3;
             col = miglioreMossa.coordinataX % 3;
@@ -61,13 +79,57 @@
             return (numTris, row, col);
         }
 
+        private (int numTris, int row, int col)? CalcolaMossaRandom(string boardState, int trisObbligatoria)
+        {
+            List<(int numTris, int row, int col)> mosseValide = new List<(int numTris, int row, int col)>();
+
+            if (trisObbligatoria == -1)
+            {
+                // Mossa libera - trova tutte le mosse valide in tutti i tris
+                for (int numTris = 0; numTris < 9; numTris++)
+                {
+                    AggiungiMosseValide(mosseValide, boardState, numTris);
+                }
+            }
+            else
+            {
+                // Mossa obbligatoria - trova mosse nel tris specificato
+                AggiungiMosseValide(mosseValide, boardState, trisObbligatoria);
+            }
+
+            if (mosseValide.Count == 0)
+                return null;
+
+            // Scegli una mossa a caso
+            int indice = random.Next(mosseValide.Count);
+            return mosseValide[indice];
+        }
+
+        private void AggiungiMosseValide(List<(int numTris, int row, int col)> mosse, string boardState, int numTris)
+        {
+            int offset = numTris * 9;
+
+            for (int i = 0; i < 9; i++)
+            {
+                if (boardState[offset + i] == '-')
+                {
+                    int row = i / 3;
+                    int col = i % 3;
+                    mosse.Add((numTris, row, col));
+                }
+            }
+        }
+
         public void NotificaRisultatoPartita(bool? haVinto)
         {
+            // Reset del contatore mosse per la prossima partita
+            mosseGiocate = 0;
         }
 
         public void ResetPartita()
         {
             Array.Clear(gameState, 0, gameState.Length);
+            mosseGiocate = 0;
         }
 
         // -------- PARSING BOARD STATE --------
@@ -107,7 +169,7 @@
 
         // -------- ALGORITMO MINIMAX --------
 
-        private int Minimax(int depth, int[,] matrix, bool isBot, Mossa ultimaMossa, int alpha, int beta, ref Mossa miglioreMossa, bool isPrimaChiamata)
+        private int Minimax(int depth, int[,] matrix, bool isBot, Mossa ultimaMossa, int alpha, int beta, ref Mossa miglioreMossa, bool isPrimaChiamata, int trisObbligatoria = -1)
         {
             int valVittoria = CheckVittoriaGlobale(matrix);
             int xInizio, xFine, yInizio, yFine, numTrisObbligatorio;
@@ -120,18 +182,41 @@
 
             if (depth == 0) return FunzioneValutativa(matrix);
 
-            xInizio = ultimaMossa.coordinataX - (ultimaMossa.coordinataX % 3);
-            xFine = xInizio + 3;
-            yInizio = ultimaMossa.coordinataY - (ultimaMossa.coordinataY % 3);
-            yFine = yInizio + 3;
-
-            numTrisObbligatorio = (yInizio / 3) * 3 + (xInizio / 3);
-            if (IsTrisCompleted(matrix, numTrisObbligatorio))
+            // Gestione della mossa libera o obbligatoria
+            if (isPrimaChiamata && trisObbligatoria == -1)
             {
+                // MOSSA LIBERA - esplora tutti i tris disponibili
                 xInizio = 0;
                 xFine = 9;
                 yInizio = 0;
                 yFine = 9;
+            }
+            else if (isPrimaChiamata && trisObbligatoria != -1)
+            {
+                // MOSSA OBBLIGATORIA - esplora solo il tris specificato
+                int trisRow = trisObbligatoria / 3;
+                int trisCol = trisObbligatoria % 3;
+                xInizio = trisCol * 3;
+                xFine = xInizio + 3;
+                yInizio = trisRow * 3;
+                yFine = yInizio + 3;
+            }
+            else
+            {
+                // Mosse successive - usa la logica normale basata sull'ultima mossa
+                xInizio = ultimaMossa.coordinataX - (ultimaMossa.coordinataX % 3);
+                xFine = xInizio + 3;
+                yInizio = ultimaMossa.coordinataY - (ultimaMossa.coordinataY % 3);
+                yFine = yInizio + 3;
+
+                numTrisObbligatorio = (yInizio / 3) * 3 + (xInizio / 3);
+                if (IsTrisCompleted(matrix, numTrisObbligatorio))
+                {
+                    xInizio = 0;
+                    xFine = 9;
+                    yInizio = 0;
+                    yFine = 9;
+                }
             }
 
             if (isBot)
@@ -151,7 +236,10 @@
                             value = Minimax(depth - 1, matrix, false, tempMossa, alpha, beta, ref dummy, false);
                             matrix[i, j] = 0;
 
-                            if (isPrimaChiamata && value > bestValue) miglioreMossa = tempMossa;
+                            if (isPrimaChiamata && value > bestValue)
+                            {
+                                miglioreMossa = tempMossa;
+                            }
 
                             bestValue = Math.Max(bestValue, value);
                             alpha = Math.Max(alpha, value);
@@ -373,10 +461,10 @@
 
             if (trisVintiBot > 0 && trisVintiPlayer > 0) return 0;
 
-            if (trisVintiBot == 2) punteggio += 2000;           // ✅ MASSIMA PRIORITÀ - quasi vittoria!
-            else if (trisVintiPlayer == 2) punteggio -= 2000;   // ✅ BLOCCA SUBITO!
+            if (trisVintiBot == 2) punteggio += 2000;
+            else if (trisVintiPlayer == 2) punteggio -= 2000;
 
-            punteggio += somma;  // Aggiungi tendenze
+            punteggio += somma;
 
             return punteggio;
         }
