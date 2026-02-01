@@ -1,5 +1,4 @@
-﻿using cazzateeeee.Classes;
-using cazzateeeee.Helpers;
+﻿using cazzateeeee.Helpers;
 using cazzateeeee.AI;
 
 namespace cazzateeeee
@@ -15,10 +14,10 @@ namespace cazzateeeee
         private int modalitaGioco;  // 0 = PVP, 1 = PVE, 2 = EVE
         private int tipoBot;
         private AlberoPesato botAllenato;
-        private HeuristicBot botAlgoritmico;
+        private MinimaxBot botAlgoritmico;
         private bool botInPensiero;
         private ColorManager colorManager = new ColorManager();
-        private string PathVersoPesi = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "supertris_bot.weights");
+        private string percorsoFile;
 
         // EvE Mode
         private FileWatcher fileWatcher;
@@ -59,7 +58,7 @@ namespace cazzateeeee
                     }
                     else
                     {
-                        botAlgoritmico = new HeuristicBot();
+                        botAlgoritmico = new MinimaxBot();
                     }
                     break;
 
@@ -73,13 +72,22 @@ namespace cazzateeeee
                     }
                     else
                     {
-                        botAlgoritmico = new HeuristicBot();
+                        botAlgoritmico = new MinimaxBot();
                     }
 
                     // Inizializza il file watcher
-                    string percorsoFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mosse.txt");
-                    fileWatcher = new FileWatcher(percorsoFile, OnMossaAvversarioRicevuta);
-                    fileWatcher.Avvia();
+                    OpenFileDialog openDialog = new OpenFileDialog
+                    {
+                        Filter = "File mosse (*.txt)|*.txt|Tutti i file (*.*)|*.*",
+                        DefaultExt = "mosse"
+                    };
+
+                    if (openDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        percorsoFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mosse.txt");
+                        fileWatcher = new FileWatcher(percorsoFile, OnMossaAvversarioRicevuta);
+                        fileWatcher.Avvia();
+                    }
 
                     // Se sono il giocatore 1, faccio la prima mossa
                     if (sonoGiocatore1)

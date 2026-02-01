@@ -39,10 +39,11 @@ namespace cazzateeeee.AI
                 (int numTris, int row, int col) mossaMiglioreGlobale = (-1, -1, -1);
                 int punteggioMiglioreGlobale = int.MinValue;
 
-                for (int numTris = 0; numTris < 9; numTris++)
+                // FIX: Usato 'i' invece di 'numTris' per evitare shadowing
+                for (int i = 0; i < 9; i++)
                 {
                     // Trova la migliore mossa in questo tris
-                    var mossaMiglioreTris = TrovaMiglioreMossaInTris(boardState, numTris, turno, avversario);
+                    var mossaMiglioreTris = TrovaMiglioreMossaInTris(boardState, i, turno, avversario);
 
                     if (mossaMiglioreTris.HasValue)
                     {
@@ -52,7 +53,8 @@ namespace cazzateeeee.AI
                             (punteggio == punteggioMiglioreGlobale && random.Next(2) == 0))
                         {
                             punteggioMiglioreGlobale = punteggio;
-                            mossaMiglioreGlobale = (numTris, mossaMiglioreTris.Value.row, mossaMiglioreTris.Value.col);
+                            // FIX: Ora usa 'i' correttamente
+                            mossaMiglioreGlobale = (i, mossaMiglioreTris.Value.row, mossaMiglioreTris.Value.col);
                         }
                     }
                 }
